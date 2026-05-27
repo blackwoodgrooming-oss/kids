@@ -1,0 +1,6 @@
+{
+  "name": "سحاب للأطفال - دروبشيبينغ",
+  "description": "منصة متطورة ومتجر راقي لمنتجات العناية بالأطفال، مربوط بذكاء مع AliExpress و CJ Dropshipping لاستيراد وتعيين الهامش الربحي وإرسال الطلبات آلياً.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

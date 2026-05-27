@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Cairo", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #fcf8f4; /* Warm luxury soft cream-peach background */
+  color: #2f251e; /* Deep earthy charcoal color for perfect readability */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar matching soft peach/cream brand theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #fbf5ee;
+}
+::-webkit-scrollbar-thumb {
+  background: #ebdcc9;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #dfcbba;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
