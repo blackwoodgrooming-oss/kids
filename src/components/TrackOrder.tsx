@@ -4,6 +4,7 @@ import {
   MapPin, Clipboard, CheckCircle, Package, 
   Clock, Truck, ThumbsUp, AlertCircle, Sparkles 
 } from 'lucide-react';
+import { translations, productTranslations } from '../types';
 
 interface OrderItem {
   product: {
@@ -25,23 +26,30 @@ interface TrackedOrder {
   customerAddress: string;
   items: OrderItem[];
   totalPrice: number;
+  currency?: string;
   status: 'pending' | 'processing' | 'shipped' | 'fulfilled';
   date: string;
   dropshipSource: string;
   trackingNumber?: string;
 }
 
-export default function TrackOrder() {
+interface TrackOrderProps {
+  language: 'ar' | 'en';
+}
+
+export default function TrackOrder({ language }: TrackOrderProps) {
   const [orderIdQuery, setOrderIdQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
   const [trackedOrder, setTrackedOrder] = useState<TrackedOrder | null>(null);
   const [copiedId, setCopiedId] = useState(false);
 
+  const t = translations[language];
+
   const handleTrackSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderIdQuery.trim()) {
-      setErrorText("الرجاء إدخال كود الطلب بشكل صحيح.");
+      setErrorText(t.track_error_empty);
       return;
     }
 
@@ -56,11 +64,15 @@ export default function TrackOrder() {
       if (resp.ok && data.success) {
         setTrackedOrder(data.order);
       } else {
-        setErrorText(data.error || "خطأ أثناء محاولة تتبع الطلب. الرجاء التحقق من كود الطلب.");
+        if (language === 'en') {
+          setErrorText(t.track_error_fallback);
+        } else {
+          setErrorText(data.error || t.track_error_fallback);
+        }
       }
     } catch (err) {
       console.error(err);
-      setErrorText("تعذر الاتصال بخادم بوابة تتبع شحنات سحاب للأطفال.");
+      setErrorText(t.track_error_connection);
     } finally {
       setLoading(false);
     }
@@ -77,32 +89,32 @@ export default function TrackOrder() {
     const steps = [
       {
         key: 'pending',
-        title: 'تأكيد الطلب المبدئي',
-        desc: 'تم تسجيل طلب الرضيع بنجاح ودخل نظام التدقيق والتعقيم.',
+        title: t.step1_title,
+        desc: t.step1_desc,
         icon: Clock,
         activeColor: 'text-amber-500 bg-amber-50 border-amber-300',
         doneColor: 'text-emerald-600 bg-emerald-50 border-emerald-500'
       },
       {
         key: 'processing',
-        title: 'تجهيز وتعقيم الشحنة',
-        desc: 'يتم الآن فرز منتجات العناية بالطفل للتأكد من مطابقتها لأعلى معايير الأمان وخلو المواد من البلاستيك الضار الـ BPA.',
+        title: t.step2_title,
+        desc: t.step2_desc,
         icon: Package,
         activeColor: 'text-orange-500 bg-orange-50 border-orange-300',
         doneColor: 'text-emerald-600 bg-emerald-50 border-emerald-500'
       },
       {
         key: 'shipped',
-        title: 'مغادرة الشحنة والترانزيت',
-        desc: 'تم نقل الشحنة وتسليمها لخط الطيران الدولي المباشر المتجه إلى الخليج العربي.',
+        title: t.step3_title,
+        desc: t.step3_desc,
         icon: Truck,
         activeColor: 'text-blue-500 bg-blue-50 border-blue-300',
         doneColor: 'text-emerald-600 bg-emerald-50 border-emerald-500'
       },
       {
         key: 'fulfilled',
-        title: 'اكتمل التسليم والاستلام والتدقيق',
-        desc: 'تم تسليم طرد مستلزمات الأطفال لعنوانك بأمان وراحة تامة.',
+        title: t.step4_title,
+        desc: t.step4_desc,
         icon: ThumbsUp,
         activeColor: 'text-emerald-600 bg-emerald-50 border-emerald-400',
         doneColor: 'text-emerald-600 bg-emerald-50 border-emerald-600'
@@ -127,19 +139,19 @@ export default function TrackOrder() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6" dir="rtl">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       
       {/* Editorial Title */}
       <div className="text-center mb-10 max-w-lg mx-auto">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ff7c5c]/10 text-[#ff7c5c] px-3.5 py-1 text-[11px] font-bold border border-[#ff7c5c]/20 mb-3">
           <Sparkles className="h-3 w-3" />
-          <span>تتبع شحنات سحاب للأطفال الفورية</span>
+          <span>{t.track_banner}</span>
         </span>
         <h2 className="text-2xl font-extrabold text-[#2f251e] sm:text-3xl tracking-tight leading-snug">
-          بوابة تتبع طلبات سحاب الذكية للأطفال
+          {t.track_title}
         </h2>
         <p className="mt-2.5 text-xs text-[#8e7a6b] leading-relaxed font-medium">
-          أدخلي كود تتبع الطلب الخاص بطفلك والمكون من (SAB-2026-XXXX) الذي تلقيتِه في نهاية الفاتورة لمشاهدة حالة الشحنة فوراً مباشرة في متجرنا بالتفصيل.
+          {t.track_desc}
         </p>
       </div>
 
@@ -152,10 +164,10 @@ export default function TrackOrder() {
               required
               value={orderIdQuery}
               onChange={(e) => setOrderIdQuery(e.target.value)}
-              placeholder="مثال: SAB-2026-6824"
-              className="w-full text-xs font-bold rounded-2xl border border-[#ecdcc9] bg-[#faf6f2]/50 px-4 py-3.5 text-right placeholder-gray-400 focus:border-[#ff7c5c] focus:ring-1 focus:ring-[#ff7c5c] focus:outline-none transition-all uppercase tracking-wider"
+              placeholder={t.track_placeholder}
+              className={`w-full text-xs font-bold rounded-2xl border border-[#ecdcc9] bg-[#faf6f2]/50 px-4 py-3.5 placeholder-gray-400 focus:border-[#ff7c5c] focus:ring-1 focus:ring-[#ff7c5c] focus:outline-none transition-all uppercase tracking-wider ${language === 'ar' ? 'text-right' : 'text-left'}`}
             />
-            <Eye className="absolute left-3.5 top-3.5 w-5 h-5 text-[#8e7a6b] opacity-60 pointer-events-none" />
+            <Eye className={`absolute top-3.5 w-5 h-5 text-[#8e7a6b] opacity-60 pointer-events-none ${language === 'ar' ? 'left-3.5' : 'right-3.5'}`} />
           </div>
           <button
             type="submit"
@@ -165,12 +177,12 @@ export default function TrackOrder() {
             {loading ? (
               <>
                 <div className="h-4.5 w-4.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                <span>جاري البحث والاستفسار من قاعدة البيانات...</span>
+                <span>{t.track_loading}</span>
               </>
             ) : (
               <>
                 <Search className="h-4.5 w-4.5" />
-                <span>استعلام وتتبع الآن</span>
+                <span>{t.track_query_btn}</span>
               </>
             )}
           </button>
@@ -192,25 +204,27 @@ export default function TrackOrder() {
           <div className="bg-gradient-to-br from-white to-[#fdfcfa] rounded-3xl border border-[#ecdcc9] p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-bold text-gray-500">رقم الطلب الفريد:</span>
+                <span className="text-xs font-bold text-gray-500">{t.order_unique_no}</span>
                 <span className="text-md font-mono font-black text-[#ff7c5c]">{trackedOrder.id}</span>
               </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#8e7a6b] font-medium">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-3.5 w-3.5" />
-                  <span>تاريخ الشراء: {trackedOrder.date}</span>
+                  <span>{t.purchase_date} {trackedOrder.date}</span>
                 </span>
                 <span>|</span>
                 <span className="flex items-center gap-1">
-                  <span className="text-orange-500 font-extrabold">طريقة التوصيل:</span>
-                  <span>توصيل منزلي سريع وآمن</span>
+                  <span className="text-orange-500 font-extrabold">{t.delivery_method}</span>
+                  <span>{t.delivery_method_desc}</span>
                 </span>
               </div>
             </div>
 
             <div className="flex flex-col items-end gap-1 shrink-0">
-              <span className="text-[10px] font-bold text-gray-400">إجمالي فاتورة سحاب للأطفال:</span>
-              <span className="text-xl font-black text-[#ff7c5c] font-mono">{trackedOrder.totalPrice} ريال سعودي</span>
+              <span className="text-[10px] font-bold text-gray-400">{t.grand_total_bill}</span>
+              <span className="text-xl font-black text-[#ff7c5c] font-mono">
+                {trackedOrder.totalPrice} {trackedOrder.currency === 'ريال سعودي' && language === 'en' ? 'SAR' : (trackedOrder.currency || (language === 'en' ? 'SAR' : 'ر.س'))}
+              </span>
             </div>
           </div>
 
@@ -218,7 +232,7 @@ export default function TrackOrder() {
           <div className="bg-white rounded-3xl border border-[#ecdcc9] p-6 sm:p-8 shadow-sm">
             <h3 className="text-xs uppercase font-extrabold tracking-wider text-[#a49182] mb-6 flex items-center gap-2">
               <Truck className="h-4.5 w-4.5 text-[#ff7c5c]" />
-              <span>مخطط تتبع حالة شحنة الرضيع اللحظي</span>
+              <span>{t.timeline_title}</span>
             </h3>
 
             {/* Custom Responsive Progress Bar */}
@@ -239,7 +253,7 @@ export default function TrackOrder() {
               {getTimelineSteps(trackedOrder.status).map((step, idx) => {
                 const IconComp = step.icon;
                 return (
-                  <div key={idx} className="flex flex-row md:flex-col items-start md:items-center text-right md:text-center gap-4 md:gap-3">
+                  <div key={idx} className={`flex flex-row md:flex-col items-start md:items-center gap-4 md:gap-3 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                     
                     {/* Circle Node Icon */}
                     <div className={`flex h-11 w-11 items-center justify-center rounded-2xl border-2 transition-all duration-500 shrink-0 shadow-sm ${
@@ -273,14 +287,14 @@ export default function TrackOrder() {
             {trackedOrder.trackingNumber && (
               <div className="mt-8 pt-6 border-t border-dashed border-[#ecdcc9] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div className="text-xs text-[#8e7a6b] font-medium leading-relaxed">
-                  📦 <strong>رمز الشحنة الدولي:</strong> يمكنك استخدام هذا الرمز لتتبع طرد طفلك مع شركات التوصيل المحلية بمجرد وصوله للمملكة/الخليج:
+                  📦 <strong>{t.copiable_shipcode_label}</strong> {t.copiable_shipcode_desc}
                 </div>
                 <div className="flex items-center gap-1 bg-[#fdf8f4] border border-[#f0ded0] rounded-xl p-1 shrink-0">
                   <span className="text-xs font-mono font-bold text-[#ff7c5c] px-3.5">{trackedOrder.trackingNumber}</span>
                   <button 
                     onClick={() => copyToClipboard(trackedOrder.trackingNumber || "")}
                     className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-[#e8dcd0] text-gray-500 hover:text-[#ff7c5c] transition-all"
-                    title="نسخ الرمز"
+                    title="Copy Code"
                   >
                     <Clipboard className="h-4 w-4" />
                   </button>
@@ -289,7 +303,7 @@ export default function TrackOrder() {
             )}
             
             {copiedId && (
-              <p className="text-[10px] text-emerald-600 font-bold text-left mt-1">✓ تم نسخ رقم التتبع واللوجستيات بنجاح!</p>
+              <p className="text-[10px] text-emerald-600 font-bold text-left mt-1">{t.copy_success}</p>
             )}
           </div>
 
@@ -300,25 +314,25 @@ export default function TrackOrder() {
             <div className="bg-white rounded-3xl border border-[#ecdcc9] p-6 shadow-sm">
               <h3 className="text-xs uppercase font-extrabold tracking-wider text-[#a49182] mb-4 flex items-center gap-2">
                 <MapPin className="h-4.5 w-4.5 text-[#ff7c5c]" />
-                <span>بيانات عنوان تسليم الرضيع المسجلة</span>
+                <span>{t.address_node_title}</span>
               </h3>
 
               <div className="space-y-3.5 text-xs">
                 <div className="flex items-center gap-2.5">
                   <User className="h-4 w-4 text-gray-400 shrink-0" />
-                  <span className="text-gray-500 font-medium">اسم العميل:</span>
+                  <span className="text-gray-500 font-medium">{t.customer_name}</span>
                   <strong className="text-gray-850 font-bold">{trackedOrder.customerName}</strong>
                 </div>
 
                 <div className="flex items-center gap-2.5">
                   <Phone className="h-4 w-4 text-gray-400 shrink-0" />
-                  <span className="text-gray-500 font-medium">الهاتف الجوال:</span>
+                  <span className="text-gray-500 font-medium">{t.mobile_phone}</span>
                   <strong className="text-gray-850 font-bold font-mono tracking-wide">{trackedOrder.customerPhone}</strong>
                 </div>
 
                 <div className="flex items-start gap-2.5">
                   <MapPin className="h-4 w-4 text-gray-400 shrink-0 mt-0.5" />
-                  <span className="text-gray-500 font-medium shrink-0">العنوان التفصيلي:</span>
+                  <span className="text-gray-500 font-medium shrink-0">{t.detailed_address}</span>
                   <strong className="text-gray-850 font-bold leading-relaxed">{trackedOrder.customerAddress}</strong>
                 </div>
               </div>
@@ -328,26 +342,32 @@ export default function TrackOrder() {
             <div className="bg-white rounded-3xl border border-[#ecdcc9] p-6 shadow-sm">
               <h3 className="text-xs uppercase font-extrabold tracking-wider text-[#a49182] mb-4 flex items-center gap-2">
                 <Package className="h-4.5 w-4.5 text-[#ff7c5c]" />
-                <span>مستلزمات الأطفال في الطرد</span>
+                <span>{t.infants_in_box}</span>
               </h3>
 
               <div className="space-y-3 max-h-48 overflow-y-auto px-1">
-                {trackedOrder.items.map((item, idx) => (
-                  <div key={idx} className="flex gap-3 items-center p-2 rounded-xl bg-[#faf6f2]/60 hover:bg-[#faf6f2] border border-[#f5ece3]/50">
-                    <img 
-                      src={item.product?.imageUrl} 
-                      alt="" 
-                      className="h-11 w-11 object-cover rounded-lg bg-gray-50 shrink-0" 
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-extrabold text-gray-900 truncate">{item.product?.title || "منتج العناية بالطفل"}</h4>
-                      <p className="text-[10px] text-gray-400 mt-0.5 font-medium">مستورد ومفحوص • الكمية: {item.quantity}</p>
+                {trackedOrder.items.map((item, idx) => {
+                  const titleToRender = language === 'en' && item.product?.id && productTranslations[item.product.id]
+                    ? productTranslations[item.product.id].title
+                    : (item.product?.title || "Baby Essential Product");
+
+                  return (
+                    <div key={idx} className="flex gap-3 items-center p-2 rounded-xl bg-[#faf6f2]/60 hover:bg-[#faf6f2] border border-[#f5ece3]/50">
+                      <img 
+                        src={item.product?.imageUrl} 
+                        alt="" 
+                        className="h-11 w-11 object-cover rounded-lg bg-gray-50 shrink-0" 
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-xs font-extrabold text-gray-900 truncate">{titleToRender}</h4>
+                        <p className="text-[10px] text-gray-400 mt-0.5 font-medium">{t.imported_inspected} • {t.qty} {item.quantity}</p>
+                      </div>
+                      <div className="text-xs font-mono font-black text-[#ff7c5c] shrink-0">
+                        {((item.product?.price || 0) * item.quantity)} {trackedOrder.currency === 'ريال سعودي' && language === 'en' ? 'SAR' : (trackedOrder.currency || (language === 'en' ? 'SAR' : 'ر.س'))}
+                      </div>
                     </div>
-                    <div className="text-xs font-mono font-black text-[#ff7c5c] shrink-0">
-                      {(item.product?.price || 0) * item.quantity} ر.س
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -355,7 +375,7 @@ export default function TrackOrder() {
 
           {/* Call to Trust action */}
           <div className="bg-[#f0faf4] border border-emerald-150 rounded-2xl p-4 text-center text-xs text-emerald-800 leading-relaxed font-semibold">
-            👶 <strong>صحة طفلك هي أولويتنا:</strong> جميع مستلزمات سحاب مفحوصة بدقة فائقة ومعبأة بصناديق مفرغة من الهواء للتأمين الطبي الشامل ومطابقة لمعايير الجودة العالمية لحماية الرضع.
+            👶 {t.health_priority}
           </div>
 
         </div>

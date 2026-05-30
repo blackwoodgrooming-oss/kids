@@ -1,12 +1,16 @@
 import React from 'react';
-import { Cloud, Search, ShoppingBag, Eye, HelpCircle } from 'lucide-react';
+import { Cloud, ShoppingBag, Eye } from 'lucide-react';
+import { CountryOption, countryOptions, translations } from '../types';
 
 interface StoreHeaderProps {
   currentView: 'store' | 'track';
   setView: (view: 'store' | 'track') => void;
   cartCount: number;
   openCart: () => void;
-  currency: string;
+  selectedCountry: CountryOption;
+  onChangeCountry: (country: CountryOption) => void;
+  language: 'ar' | 'en';
+  onChangeLanguage: (lang: 'ar' | 'en') => void;
 }
 
 export default function StoreHeader({
@@ -14,23 +18,30 @@ export default function StoreHeader({
   setView,
   cartCount,
   openCart,
-  currency,
+  selectedCountry,
+  onChangeCountry,
+  language,
+  onChangeLanguage,
 }: StoreHeaderProps) {
+  const t = translations[language];
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#f3e9dc] bg-[#fcf8f4]/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6" dir="rtl">
+      <div className="mx-auto flex flex-col md:flex-row max-w-7xl items-center justify-between px-4 py-3 sm:px-6 gap-3">
         
-        {/* Right side: Logo & Brand Description */}
+        {/* Right/Left side: Logo & Brand Description */}
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#ff7c5c] text-white shadow-md shadow-[#ff7c5c]/20 animate-float">
             <Cloud className="h-6 w-6" />
           </div>
           <div>
             <h1 className="text-xl font-extrabold tracking-tight text-[#2f251e] flex items-center gap-1.5">
-              <span>سحاب</span>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#fce9d8] text-[#ff7c5c] border border-[#fde3d3]">للأطفال</span>
+              <span>{language === 'ar' ? 'سحاب' : 'Sahab'}</span>
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#fce9d8] text-[#ff7c5c] border border-[#fde3d3]">
+                {t.logo_sub}
+              </span>
             </h1>
-            <p className="text-[10px] text-[#8e7a6b] font-semibold tracking-wide">أرقى مستلزمات العناية وألعاب الأطفال الآمنة والشهادات المعتمدة</p>
+            <p className="text-[10px] text-[#8e7a6b] font-semibold tracking-wide">{t.logo_desc}</p>
           </div>
         </div>
 
@@ -45,7 +56,7 @@ export default function StoreHeader({
             }`}
           >
             <ShoppingBag className="h-4 w-4" />
-            <span>تسوق المنتجات</span>
+            <span>{t.nav_shop}</span>
           </button>
           
           <button
@@ -57,12 +68,42 @@ export default function StoreHeader({
             }`}
           >
             <Eye className="h-4 w-4" />
-            <span>تتبع حالة الطلبات</span>
+            <span>{t.nav_track}</span>
           </button>
         </nav>
 
-        {/* Left side: Cart Actions */}
-        <div className="flex items-center gap-3">
+        {/* Left/Right side: Language, Country, and Cart Actions */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          
+          {/* Compact Language Text Switcher */}
+          <button
+            onClick={() => onChangeLanguage(language === 'ar' ? 'en' : 'ar')}
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-[#e1d5c9] hover:border-[#ff7c5c] hover:bg-[#faf6f2] transition-all duration-300 shadow-xs text-xs font-bold font-mono tracking-wider select-none text-[#6c594c] hover:text-[#ff7c5c]"
+            title={language === 'ar' ? 'English' : 'العربية'}
+          >
+            {language === 'ar' ? 'En' : 'Ar'}
+          </button>
+
+          {/* Country Selection */}
+          <div className="flex items-center gap-1.5 bg-white border border-[#e1d5c9] px-2.5 py-1.5 rounded-xl shadow-xs">
+            <span className="text-xs sm:text-sm font-medium">{selectedCountry.flag}</span>
+            <select
+              value={selectedCountry.code}
+              onChange={(e) => {
+                const found = countryOptions.find(c => c.code === e.target.value);
+                if (found) onChangeCountry(found);
+              }}
+              className="bg-transparent text-[10px] sm:text-[11px] font-bold text-[#6c594c] focus:outline-none cursor-pointer"
+            >
+              {countryOptions.map(country => (
+                <option key={country.code} value={country.code}>
+                  {country.flag} {language === 'ar' ? country.name : country.nameEn} ({language === 'ar' ? country.currency : country.currencyEn})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Cart Bag Trigger */}
           <button
             onClick={openCart}
             className="group relative flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-[#e8dcd0] text-[#2f251e] shadow-sm transition-all hover:border-[#ff7c5c] hover:text-[#ff7c5c]"
@@ -75,10 +116,7 @@ export default function StoreHeader({
               </span>
             )}
           </button>
-          
-          <div className="hidden sm:flex text-xs font-semibold px-3 py-2 bg-[#fcf8f4]/50 border border-[#ecdcc9]/40 rounded-xl text-gray-500">
-            <span>العملة: <strong className="text-orange-600 font-mono">{currency}</strong></span>
-          </div>
+
         </div>
 
       </div>

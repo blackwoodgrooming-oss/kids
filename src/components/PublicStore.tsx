@@ -5,7 +5,7 @@ import {
   Trash2, ArrowLeft, Check, Lock, Award, 
   MessageSquare, Sparkles 
 } from 'lucide-react';
-import { BabyProduct, Order, ImportConfig } from '../types';
+import { BabyProduct, Order, ImportConfig, CountryOption, getProductPrices, translations, getProductDetails } from '../types';
 
 interface PublicStoreProps {
   products: BabyProduct[];
@@ -17,6 +17,8 @@ interface PublicStoreProps {
   setCart: React.Dispatch<React.SetStateAction<{ product: BabyProduct; quantity: number }[]>>;
   isCartOpen: boolean;
   setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedCountry: CountryOption;
+  language: 'ar' | 'en';
 }
 
 export default function PublicStore({
@@ -29,6 +31,8 @@ export default function PublicStore({
   setCart,
   isCartOpen,
   setIsCartOpen,
+  selectedCountry,
+  language,
 }: PublicStoreProps) {
   // Navigation & Filter options
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,20 +57,28 @@ export default function PublicStore({
   const [reviewRating, setReviewRating] = useState(5);
   const [customReviews, setCustomReviews] = useState<{ [productId: string]: { author: string; text: string; rating: number; date: string }[] }>({});
 
-  // Categories list
-  const categories = ['الكل', 'أدوات الرضاعة والتغذية', 'ألعاب تعليمية وتنمية مهارات', 'رعاية وصحة الرضع', 'مستلزمات النوم والراحة'];
+  const t = translations[language];
+
+  // Categories list keys (original Arabic terms to keep filtration working)
+  const categoryKeys = ['الكل', 'أدوات الرضاعة والتغذية', 'ألعاب تعليمية وتنمية مهارات', 'رعاية وصحة الرضع', 'مستلزمات النوم والراحة'];
 
   // Static/preset reviews to display
-  const presetReviews = [
-    { author: "أم يوسف - الرياض", text: "الخامة جداً ناعمة وخالية من المواد الكيمائية الضارة، طفلي يرتاح جداً بالمنتج وسهلة التعقيم والمسح الصاروخي.", rating: 5, date: "قبل ٣ أيام" },
+  const presetReviews = language === 'ar' ? [
+    { author: "أم يوسف - الرياض", text: "الخامة جداً ناعمة وخالية من المواد الكيمائية الضارة، طفلي يرتاح جداً بالمنتج وسهلة التعقيم والمسح المباشر.", rating: 5, date: "قبل ٣ أيام" },
     { author: "ماريا • دبي", text: "الخامات رائعة والقطع ناعمة جداً على بشرة طفلي وجاءت مغلفة بقمة الأناقة والصحة. سأطلب كميات أخرى قريباً.", rating: 5, date: "قبل أسبوع" },
-    { author: "سارة العتيبي - جدة", text: "أكثر ما يعجبني هو تفاصيل حماية الأمن والسلامة للرضع، خفيف والعلب آمنة وخالية من المود الضارة تماماً.", rating: 5, date: "قبل يومين" }
+    { author: "سارة العتيبي - جدة", text: "أكثر ما يعجبني هو تفاصيل حماية الأمن والسلامة للرضع، خفيف والعلب آمنة وخالية من المواد الضارة تماماً.", rating: 5, date: "قبل يومين" }
+  ] : [
+    { author: "Um Youssef - Riyadh", text: "The material is extremely soft and completely free from hazardous chemical additions. Safe, comfortable, and easy to sterilize/wash.", rating: 5, date: "3 days ago" },
+    { author: "Maria - Dubai", text: "Excellent botanical colors and premium safety structure. Packed with high elegance and medical care. Will order more presets soon!", rating: 5, date: "1 week ago" },
+    { author: "Sarah Al-Otaibi - Jeddah", text: "I highly appreciate the deep focus on newborn safety and BPA-free certifications. Lightweight, soft peach cosmetics, and sturdy built.", rating: 5, date: "2 days ago" }
   ];
 
   // Filtering products
   const filteredProducts = products.filter(p => {
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          p.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const details = getProductDetails(p, language);
+    const matchesSearch = 
+      details.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      details.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'الكل' || p.category === selectedCategory;
     const matchesSource = selectedSource === 'الكل' || p.source === selectedSource;
     return matchesSearch && matchesCategory && matchesSource;
@@ -102,8 +114,18 @@ export default function PublicStore({
     ));
   };
 
-  const calculateTotal = () => {
-    return cart.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  const calculateTotalUsd = () => {
+    return cart.reduce((total, item) => {
+      const prices = getProductPrices(item.product, config.markupMultiplier, selectedCountry, language);
+      return total + (prices.usdRetailPrice * item.quantity);
+    }, 0);
+  };
+
+  const calculateTotalLocal = () => {
+    return cart.reduce((total, item) => {
+      const prices = getProductPrices(item.product, config.markupMultiplier, selectedCountry, language);
+      return total + (prices.localPrice * item.quantity);
+    }, 0);
   };
 
   // Checkout submit handler
@@ -114,6 +136,8 @@ export default function PublicStore({
     const newOrderId = 'SAB-2026-' + Math.floor(1000 + Math.random() * 9000);
     const primarySource = cart[0].product.source === 'Manual' ? 'AliExpress' : cart[0].product.source;
 
+    const localCurrencyString = language === 'ar' ? selectedCountry.currency : selectedCountry.currencyEn;
+
     const newOrder: Order = {
       id: newOrderId,
       customerName: checkoutName,
@@ -121,9 +145,10 @@ export default function PublicStore({
       customerEmail: checkoutEmail,
       customerAddress: checkoutAddress,
       items: [...cart],
-      totalPrice: calculateTotal(),
+      totalPrice: Number(calculateTotalLocal().toFixed(selectedCountry.code === 'KW' ? 3 : 1)),
+      currency: localCurrencyString,
       status: 'pending',
-      date: new Date().toLocaleDateString('ar-SA') + ' - ' + new Date().toLocaleTimeString('ar-SA'),
+      date: new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US') + ' - ' + new Date().toLocaleTimeString(language === 'ar' ? 'ar-SA' : 'en-US'),
       dropshipSource: primarySource as any,
     };
 
@@ -137,7 +162,6 @@ export default function PublicStore({
       if (res.ok) {
         setOrders(prev => [newOrder, ...prev]);
       } else {
-        // Fallback locally
         setOrders(prev => [newOrder, ...prev]);
       }
     } catch (err) {
@@ -176,7 +200,7 @@ export default function PublicStore({
       author: reviewAuthor,
       text: reviewText,
       rating: reviewRating,
-      date: "الآن"
+      date: language === 'ar' ? "الآن" : "Just now"
     };
 
     setCustomReviews(prev => ({
@@ -189,27 +213,29 @@ export default function PublicStore({
     setReviewRating(5);
   };
 
+  const selectedProductDetails = selectedProduct ? getProductDetails(selectedProduct, language) : null;
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-10" dir="rtl">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-10">
       
       {/* Top promotional banner styled with high editorial aesthetic */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#feedda] via-[#ffebd5] to-[#fde1ce] border border-[#fbd6b8] p-6 sm:p-10 mb-8 shadow-sm">
         <div className="relative z-10 max-w-2xl">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ff7c5c] px-3 py-1 text-[10px] font-bold text-white shadow-sm mb-4">
             <Sparkles className="h-3 w-3 animate-pulse" />
-            <span>منتجات طبية خالية من الـ BPA ورائعة للرضع</span>
+            <span>{t.banner_tag}</span>
           </span>
           <h2 className="text-2xl font-extrabold text-[#2f251e] sm:text-4xl leading-snug">
-            العناية الغيمية الهادئة بجيل الغد الفاخر
+            {t.banner_title}
           </h2>
           <p className="mt-4 text-xs sm:text-sm text-[#7e6b5c] leading-relaxed max-w-lg">
-            نوفر في <span className="font-bold text-[#ff7c5c]">سحاب للأطفال</span> باقة منتقاة بعناية وموثوقية فائقة من مستلزمات العناية وألعاب الرضع الطبيعية المصممة خصيصاً لصحة طفلك واطمئنانك.
+            {t.banner_desc}
           </p>
           
           <div className="mt-6 flex flex-wrap gap-4 text-[11px] font-bold text-[#6c594c]">
-            <span className="flex items-center gap-1 bg-white/75 border border-[#fcddc3] px-3 py-1.5 rounded-xl">🛡️ حماية خامات البامبو</span>
-            <span className="flex items-center gap-1 bg-white/75 border border-[#fcddc3] px-3 py-1.5 rounded-xl">🚀 شحن متتبع مباشر للخليج</span>
-            <span className="flex items-center gap-1 bg-white/75 border border-[#fcddc3] px-3 py-1.5 rounded-xl">☁️ سيليكون مرن فائق النعومة</span>
+            <span className="flex items-center gap-1 bg-white/75 border border-[#fcddc3] px-3 py-1.5 rounded-xl">{t.banner_bullet1}</span>
+            <span className="flex items-center gap-1 bg-white/75 border border-[#fcddc3] px-3 py-1.5 rounded-xl">{t.banner_bullet2}</span>
+            <span className="flex items-center gap-1 bg-white/75 border border-[#fcddc3] px-3 py-1.5 rounded-xl">{t.banner_bullet3}</span>
           </div>
         </div>
 
@@ -223,24 +249,27 @@ export default function PublicStore({
         
         {/* Category filters */}
         <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 max-w-3xl">
-          {categories.map((cat, idx) => (
-            <button
-              key={idx}
-              onClick={() => setSelectedCategory(cat)}
-              className={`rounded-xl px-4 py-2.5 text-xs font-bold transition-all border shrink-0 ${
-                selectedCategory === cat
-                  ? 'bg-[#2f251e] text-white border-transparent'
-                  : 'bg-white text-[#6c594c] border-[#ecdcc9] hover:border-[#ff7c5c] hover:text-[#ff7c5c]'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          {categoryKeys.map((catKey, idx) => {
+            const displayLabel = t.categories[catKey] || catKey;
+            return (
+              <button
+                key={idx}
+                onClick={() => setSelectedCategory(catKey)}
+                className={`rounded-xl px-4 py-2.5 text-xs font-bold transition-all border shrink-0 ${
+                  selectedCategory === catKey
+                    ? 'bg-[#2f251e] text-white border-transparent'
+                    : 'bg-white text-[#6c594c] border-[#ecdcc9] hover:border-[#ff7c5c] hover:text-[#ff7c5c]'
+                }`}
+              >
+                {displayLabel}
+              </button>
+            );
+          })}
         </div>
 
         {/* Filter Indicator */}
-        <div className="flex items-center gap-1.5 bg-white border border-[#ecdcc9] px-3 py-2 rounded-xl">
-          <span className="text-[10px] font-extrabold text-[#8e7a6b]">تشكيلة حصرية فاخرة للأمهات</span>
+        <div className="flex items-center gap-1.5 bg-white border border-[#ecdcc9] px-3 py-2 rounded-xl shrink-0">
+          <span className="text-[10px] font-extrabold text-[#8e7a6b]">{t.exclusivity}</span>
         </div>
       </div>
 
@@ -248,48 +277,54 @@ export default function PublicStore({
       <div className="mb-8 max-w-md relative">
         <input
           type="text"
-          placeholder="ابحث عن منتجات العناية بالطفل، الألعاب، أو المرايل..."
+          placeholder={t.review_placeholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full text-xs font-medium rounded-2xl border border-[#ecdcc9] bg-white pl-4 pr-10 py-3 text-[#2f251e] placeholder-gray-400 focus:border-[#ff7c5c] focus:outline-none focus:ring-1 focus:ring-[#ff7c5c] transition-all"
+          className={`w-full text-xs font-medium rounded-2xl border border-[#ecdcc9] bg-white py-3 text-[#2f251e] placeholder-gray-400 focus:border-[#ff7c5c] focus:outline-none focus:ring-1 focus:ring-[#ff7c5c] transition-all ${language === 'ar' ? 'pl-4 pr-10' : 'pl-10 pr-4'}`}
         />
-        <Search className="absolute right-3.5 top-3 w-4.5 h-4.5 text-gray-400" />
+        <Search className={`absolute top-3 w-4.5 h-4.5 text-gray-400 ${language === 'ar' ? 'right-3.5' : 'left-3.5'}`} />
       </div>
 
       {/* Product Catalog Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {filteredProducts.map((p) => {
           const isLiked = likedProducts.includes(p.id);
+          const details = getProductDetails(p, language);
+          const prices = getProductPrices(p, config.markupMultiplier, selectedCountry, language);
+
           return (
             <div
               key={p.id}
               onClick={() => setSelectedProduct(p)}
-              className="group relative cursor-pointer flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-[#e8dcd0] p-4 shadow-sm hover:shadow-md transition-all duration-300"
+              className="group relative cursor-pointer flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-[#e8dcd0] p-4 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in"
             >
               
               {/* Product Visual Container */}
               <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#faf6f2] mb-4">
                 <img
                   src={p.imageUrl}
-                  alt={p.title}
+                  alt={details.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
+                  referrerPolicy="no-referrer"
                 />
 
                 {/* Like floating button */}
                 <button
                   onClick={(e) => toggleLike(p.id, e)}
-                  className={`absolute top-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 backdrop-blur-md shadow-sm transition-all hover:bg-white ${
-                    isLiked ? 'text-rose-500' : 'text-gray-400 hover:text-rose-500'
-                  }`}
+                  className={`absolute top-2.5 flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 backdrop-blur-md shadow-sm transition-all hover:bg-white ${
+                    language === 'ar' ? 'right-2.5' : 'left-2.5'
+                  } ${isLiked ? 'text-rose-500' : 'text-gray-400 hover:text-rose-500'}`}
                 >
                   <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
                 </button>
 
                 {/* Safety Badge */}
-                {p.safetyRating && (
-                  <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-lg bg-emerald-50/90 backdrop-blur-md border border-emerald-100 px-2 py-1 text-[9px] font-bold text-emerald-800">
-                    🛡️ {p.safetyRating.split(' ')[0]} جودة معتمدة
+                {details.safetyRating && (
+                  <span className={`absolute bottom-2.5 inline-flex items-center gap-1 rounded-lg bg-emerald-50/90 backdrop-blur-md border border-emerald-100 px-2 py-1 text-[9px] font-bold text-emerald-800 ${
+                    language === 'ar' ? 'right-2.5' : 'left-2.5'
+                  }`}>
+                    🛡️ {t.bpa_free}
                   </span>
                 )}
 
@@ -299,35 +334,41 @@ export default function PublicStore({
               <div className="flex-1 flex flex-col justify-between">
                 <div>
                   <div className="text-[10px] font-bold text-[#A69384] mb-1 uppercase tracking-wide flex items-center gap-1.5">
-                    <span>{p.category}</span>
+                    <span>{details.category}</span>
                     <span>•</span>
-                    <span className="text-amber-600">سن: {p.ageGroup || 'عام'}</span>
+                    <span className="text-amber-600">{t.age_label}: {details.ageGroup}</span>
                   </div>
                   <h3 className="text-xs sm:text-sm font-extrabold text-[#2f251e] line-clamp-2 leading-relaxed min-h-[40px] group-hover:text-[#ff7c5c] transition-colors">
-                    {p.title}
+                    {details.title}
                   </h3>
                 </div>
 
                 {/* Pricing / CTA row */}
-                <div className="mt-4 flex items-center justify-between pt-3 border-t border-[#faf2e9]/50">
-                  <div>
-                    <div className="text-xs text-gray-400 line-through font-mono">
-                      {(p.price * 1.3).toFixed(0)} {config.targetCurrency}
+                <div className="mt-4 flex flex-col pt-3 border-t border-[#faf2e9]/50">
+                  <div className="flex items-center justify-between w-full gap-2">
+                    <div>
+                      <div className="text-[10px] text-gray-400 line-through font-mono">
+                        ${(prices.usdRetailPrice * 1.3).toFixed(2)} USD
+                      </div>
+                      <div className="text-md font-black text-[#ff7c5c] font-mono leading-none flex items-baseline gap-1">
+                        <span>{prices.usdFormatted}</span>
+                        <span className="text-[10px] text-gray-400 font-bold font-sans">USD</span>
+                      </div>
                     </div>
-                    <div className="text-sm font-black text-[#ff7c5c] font-mono">
-                      {p.price} {config.targetCurrency}
-                    </div>
-                  </div>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCart(p);
-                    }}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2f251e] hover:bg-[#ff7c5c] text-white shift-up transition-all"
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                  </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(p);
+                      }}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2f251e] hover:bg-[#ff7c5c] text-white transition-all shrink-0"
+                    >
+                      <ShoppingBag className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="text-[10px] font-bold text-[#6c594c] mt-1.5 bg-[#fdf8f4] border border-[#f5eadc] px-2 py-1 rounded-lg text-center">
+                    {t.equivalent} <strong className="text-orange-700 font-mono">{prices.localFormatted}</strong>
+                  </div>
                 </div>
               </div>
 
@@ -337,7 +378,7 @@ export default function PublicStore({
 
         {filteredProducts.length === 0 && (
           <div className="col-span-full text-center py-16 text-gray-400 text-xs">
-            لا توجد منتجات مطابقة لخيارات الفلترة أو مصطلحات البحث الحالية.
+            {t.no_products_found}
           </div>
         )}
       </div>
@@ -345,37 +386,37 @@ export default function PublicStore({
       {/* CHECKOUT SUCCESS MODAL */}
       {checkoutSuccessCode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl bg-white border border-emerald-100 p-6 text-center shadow-2xl" dir="rtl">
+          <div className="w-full max-w-md rounded-3xl bg-white border border-emerald-100 p-6 text-center shadow-2xl">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 mb-4 animate-bounce">
               <Check className="h-8 w-8" />
             </div>
             
-            <h3 className="text-lg font-extrabold text-[#2f251e] mb-2">تم استلام طلبك وتأكيد التسوية المبدئية!</h3>
+            <h3 className="text-lg font-extrabold text-[#2f251e] mb-2">{t.success_received}</h3>
             <p className="text-xs text-[#6c594c] leading-relaxed mb-4">
-              شكراً لتسوقك معنا في سحاب للأطفال. تم تدوين طلبك برقم مرجعي مميز:
+              {t.success_desc}
             </p>
             <div className="bg-[#f0faf4] px-4 py-2 rounded-xl text-md font-mono font-black text-emerald-700 inline-block border border-emerald-100 mb-6">
               #{checkoutSuccessCode}
             </div>
 
-            <div className="text-xs text-[#8e7a6b] bg-amber-50 rounded-2xl p-3 border border-amber-100 text-right leading-relaxed mb-6 font-medium">
-              💡 **تلميح لتتبع طرد طفلك:** انسخي رمز تتبع الطلب أعلاه ثم توجهي إلى تبويب <strong>«تتبع حالة الطلبات»</strong> في أعلى شريط العناوين للاستعلام الفوري والمباشر عن تجهيز الشحنة ومسار الطائرة.
+            <div className={`text-xs text-[#8e7a6b] bg-amber-50 rounded-2xl p-3 border border-amber-100 leading-relaxed mb-6 font-medium ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+              💡 <strong>{t.success_tip_label}</strong> {t.success_tip_desc}
             </div>
 
             <button
               onClick={() => setCheckoutSuccessCode(null)}
               className="w-full rounded-2xl bg-[#2f251e] hover:bg-black text-white font-bold text-xs py-3.5 transition-all"
             >
-              متابعة التسوق ومواصلة الاستعراض
+              {t.continue_shopping}
             </button>
           </div>
         </div>
       )}
 
       {/* PRODUCT DETAIL MODAL */}
-      {selectedProduct && (
+      {selectedProduct && selectedProductDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm overflow-y-auto">
-          <div className="w-full max-w-3xl rounded-3xl bg-white border border-[#e8dcd0] p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto" dir="rtl">
+          <div className="w-full max-w-3xl rounded-3xl bg-white border border-[#e8dcd0] p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             
             {/* Close button */}
             <button
@@ -384,7 +425,7 @@ export default function PublicStore({
                 setReviewAuthor('');
                 setReviewText('');
               }}
-              className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full bg-[#fdf8f4] hover:bg-[#ff7c5c] hover:text-white text-gray-500 transition-all border border-[#f2e2d2]"
+              className={`absolute top-4 flex h-8 w-8 items-center justify-center rounded-full bg-[#fdf8f4] hover:bg-[#ff7c5c] hover:text-white text-gray-500 transition-all border border-[#f2e2d2] z-10 ${language === 'ar' ? 'left-4' : 'right-4'}`}
             >
               ✕
             </button>
@@ -392,31 +433,32 @@ export default function PublicStore({
             {/* Layout grid: Product images right / description left */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               
-              {/* Product Media (Right) */}
+              {/* Product Media */}
               <div>
                 <div className="aspect-square w-full overflow-hidden rounded-2xl bg-[#faf6f2] border border-gray-150">
                   <img
                     src={selectedProduct.imageUrl}
-                    alt={selectedProduct.title}
+                    alt={selectedProductDetails.title}
                     className="h-full w-full object-cover"
+                    referrerPolicy="no-referrer"
                   />
                 </div>
 
                 {/* Safety certification disclaimer bottom of media */}
                 <div className="mt-4 p-3.5 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-2xl text-[11px] leading-relaxed">
-                  <span className="font-extrabold block mb-1">🛡️ مؤشر السلامة والأمن المعتمد:</span>
-                  <div>{selectedProduct.safetyRating || 'خالٍ من ملحقات اللدائن وخامات مكررة آمنة لجلد أصابع الرضع حديثي الولادة.'}</div>
+                  <span className="font-extrabold block mb-1">{t.certified_safety}</span>
+                  <div>{selectedProductDetails.safetyRating || t.certified_safety_desc}</div>
                 </div>
               </div>
 
-              {/* Product specs, features, buy options (Left) */}
+              {/* Product specs, features, buy options */}
               <div className="flex flex-col justify-between">
                 <div>
                   <span className="inline-flex items-center gap-1 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold px-2 py-0.5 mb-2">
-                    {selectedProduct.category}
+                    {selectedProductDetails.category}
                   </span>
                   
-                  <h3 className="text-md sm:text-lg font-extrabold text-[#2f251e] leading-snug mb-2">{selectedProduct.title}</h3>
+                  <h3 className="text-md sm:text-lg font-extrabold text-[#2f251e] leading-snug mb-2">{selectedProductDetails.title}</h3>
                   
                   {/* Rating / source */}
                   <div className="flex items-center gap-2 text-xs mb-4">
@@ -427,29 +469,32 @@ export default function PublicStore({
                       <Star className="h-3.5 w-3.5 fill-current" />
                       <Star className="h-3.5 w-3.5 fill-current" />
                     </div>
-                    <span className="text-[#8e7a6b]">(عشرة مراجعات موثقة من أمهات حقيقيات)</span>
+                    <span className="text-[#8e7a6b]">{t.details_reviews_count}</span>
                   </div>
 
                   {/* Prices */}
                   <div className="bg-[#faf4ee] p-4 rounded-2xl border border-[#ecdcc9] mb-4">
-                    <div className="text-[11px] text-[#8e7a6b]">سعر البيع النهائي للعميل بالمتجر:</div>
-                    <div className="text-xl font-black text-[#ff7c5c] font-mono mt-0.5">
-                      {selectedProduct.price} {config.targetCurrency} 
-                      <span className="text-xs font-normal text-gray-400 mr-2">شامل ضريبة القيمة المضافة والشحن السريع</span>
+                    <div className="text-[11px] text-[#8e7a6b]">{t.product_store_price_title}</div>
+                    <div className="text-xl font-black text-[#ff7c5c] font-mono mt-0.5 flex flex-wrap items-center gap-2">
+                       <span>{getProductPrices(selectedProduct, config.markupMultiplier, selectedCountry, language).usdFormatted} USD</span>
+                       <span className="text-xs font-bold text-[#8e7a6b] bg-white border border-[#e8dcd0] px-2.5 py-1 rounded-xl">
+                         {t.equivalent} <strong className="text-[#ff7c5c]">{getProductPrices(selectedProduct, config.markupMultiplier, selectedCountry, language).localFormatted}</strong>
+                       </span>
+                       <span className="text-[10px] font-normal text-gray-400 block w-full mt-1">{t.shipping_tax_inclusive}</span>
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#7e6b5c] leading-relaxed mb-4">{selectedProduct.description}</p>
+                  <p className="text-xs text-[#7e6b5c] leading-relaxed mb-4">{selectedProductDetails.description}</p>
 
                   {/* Highlights Bullet list */}
                   <div className="mb-4">
-                    <div className="text-xs font-bold text-[#2f251e] mb-2">أبرز المميزات والمزايا:</div>
+                    <div className="text-xs font-bold text-[#2f251e] mb-2">{t.features_title}</div>
                     <ul className="text-xs text-[#6c594c] space-y-1.5 list-inside">
-                      {(selectedProduct.features && selectedProduct.features.length > 0 ? selectedProduct.features : [
-                        "آمن على اللثة الحساسة وبشرة المواليد الفائقة النعومة",
-                        "سهل التنظيف والتعقيم الحراري بمرونة عالية",
-                        "أشكال تعزز القدرات المعرفية اللمسية للأطفال"
-                      ]).map((feat, idx) => (
+                      {(selectedProductDetails.features && selectedProductDetails.features.length > 0 ? selectedProductDetails.features : [
+                        language === 'ar' ? "آمن على اللثة الحساسة وبشرة المواليد الفائقة النعومة" : "100% Gentle and safe for fragile baby development",
+                        language === 'ar' ? "سهل التنظيف والتعقيم الحراري بمرونة عالية" : "Sterilizable medical structure with great flexibility",
+                        language === 'ar' ? "أشكال تعزز القدرات المعرفية اللمسية للأطفال" : "Geometric shapes to guide toddler fine cognitive skills"
+                      ]).map((feat: string, idx: number) => (
                         <li key={idx} className="flex items-start gap-1.5">
                           <span className="text-emerald-600 font-bold shrink-0">✓</span>
                           <span>{feat}</span>
@@ -460,17 +505,17 @@ export default function PublicStore({
 
                   {/* Technical Table Specs */}
                   <div className="border-t border-[#f4eade] pt-3 mb-6">
-                    <div className="text-xs font-bold text-[#2f251e] mb-2">المواصفات الفنية المربوطة بالجرد:</div>
+                    <div className="text-xs font-bold text-[#2f251e] mb-2">{t.specs_title}</div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      {Object.entries(selectedProduct.specs || {}).map(([key, val]) => (
+                      {Object.entries(selectedProductDetails.specs || {}).map(([key, val]) => (
                         <div key={key} className="flex gap-1 py-1 px-2 bg-gray-50 rounded">
                           <span className="text-[#8e7a6b] font-medium">{key}:</span>
-                          <span className="text-gray-900 font-bold">{val}</span>
+                          <span className="text-gray-900 font-bold">{val as string}</span>
                         </div>
                       ))}
                       <div className="flex gap-1 py-1 px-2 bg-gray-50 rounded">
-                        <span className="text-[#8e7a6b] font-medium">السن المستهدف:</span>
-                        <span className="text-gray-900 font-bold">{selectedProduct.ageGroup || 'حديثي الولادة'}</span>
+                        <span className="text-[#8e7a6b] font-medium">{t.target_age}</span>
+                        <span className="text-gray-900 font-bold">{selectedProductDetails.ageGroup || t.infant}</span>
                       </div>
                     </div>
                   </div>
@@ -486,7 +531,7 @@ export default function PublicStore({
                     className="flex-1 rounded-2xl bg-[#ff7c5c] hover:bg-[#e06546] text-white font-extrabold text-xs sm:text-sm py-3.5 transition-all text-center flex items-center justify-center gap-2 shadow-md shadow-[#ff7c5c]/15"
                   >
                     <ShoppingBag className="h-4.5 w-4.5" />
-                    <span>إرسال وتعبئة في حقيبة التسوق</span>
+                    <span>{t.add_to_cart}</span>
                   </button>
                   
                   <button
@@ -495,7 +540,7 @@ export default function PublicStore({
                     }}
                     className="rounded-2xl border border-[#ecdcc9] bg-white hover:bg-gray-50 text-xs text-[#6c594c] px-4 font-bold transition-all"
                   >
-                    إغلاق التفاصيل
+                    {t.close_details}
                   </button>
                 </div>
 
@@ -506,35 +551,35 @@ export default function PublicStore({
             <div className="mt-8 pt-6 border-t border-[#e8dcd0]">
               <h4 className="text-xs uppercase font-extrabold tracking-wider text-[#a49182] mb-4 flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
-                <span>الآراء والتقييمات الموثقة من الأمهات</span>
+                <span>{t.reviews_title}</span>
               </h4>
 
               {/* Write a review box */}
               <div className="bg-[#faf4ee]/40 rounded-2xl border border-[#ecdcc9]/70 p-4 mb-6">
-                <div className="text-xs font-bold text-[#2f251e] mb-2">اكتبي تقييمك الخاص للمنتج:</div>
+                <div className="text-xs font-bold text-[#2f251e] mb-2">{t.write_review_title}</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-2">
                   <input 
                     type="text" 
-                    placeholder="اسمك مستخدم (مثال: أم شهد - الدمام)"
+                    placeholder={t.author_placeholder}
                     value={reviewAuthor}
                     onChange={(e) => setReviewAuthor(e.target.value)}
                     className="rounded-xl border border-[#ecdcc9] bg-white text-xs p-2.5 focus:border-[#ff7c5c] focus:outline-none"
                   />
                   <div className="flex items-center gap-2 bg-white rounded-xl border border-[#ecdcc9] p-2">
-                    <span className="text-[10px] text-gray-400 font-bold shrink-0">التقييم بالنجمات:</span>
+                    <span className="text-[10px] text-gray-400 font-bold shrink-0">{t.rating_placeholder}</span>
                     <select 
                       value={reviewRating}
                       onChange={(e) => setReviewRating(Number(e.target.value))}
-                      className="text-xs font-bold outline-none flex-1 text-amber-600 bg-transparent"
+                      className="text-xs font-bold outline-none flex-1 text-amber-600 bg-transparent cursor-pointer"
                     >
-                      <option value="5">⭐⭐⭐⭐⭐ (رائع جداً)</option>
-                      <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
-                      <option value="3">⭐⭐⭐ (متوسط الأداء)</option>
+                      <option value="5">{t.excellent}</option>
+                      <option value="4">{t.very_good}</option>
+                      <option value="3">{t.average}</option>
                     </select>
                   </div>
                 </div>
                 <textarea 
-                  placeholder="اكتبي تجربتك الصادقة عن جودة المادة، الملمس، وعناية الطفل..."
+                  placeholder={t.review_text_placeholder}
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
                   className="w-full h-16 rounded-xl border border-[#ecdcc9] bg-white text-xs p-2.5 focus:border-[#ff7c5c] focus:outline-none mb-2"
@@ -544,7 +589,7 @@ export default function PublicStore({
                   onClick={() => submitReview(selectedProduct.id)}
                   className="rounded-xl bg-[#2f251e] hover:bg-black text-white font-bold text-[11px] px-4 py-2 transition-all"
                 >
-                  نشر المراجعة على الفور
+                  {t.publish_review}
                 </button>
               </div>
 
@@ -591,25 +636,25 @@ export default function PublicStore({
 
       {/* CART SLIDE SIDEBAR */}
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden" dir="rtl">
+        <div className="fixed inset-0 z-50 overflow-hidden">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity" onClick={() => setIsCartOpen(false)} />
 
-          <div className="pointer-events-none fixed inset-y-0 left-0 flex max-w-full pr-10">
-            <div className="pointer-events-auto w-screen max-w-md bg-white border-r border-[#e8dcd0] shadow-2xl transition-transform">
+          <div className={`pointer-events-none fixed inset-y-0 flex max-w-full ${language === 'ar' ? 'left-0 pr-10' : 'right-0 pl-10'}`}>
+            <div className={`pointer-events-auto w-screen max-w-md bg-white shadow-2xl transition-transform ${language === 'ar' ? 'border-r border-[#e8dcd0]' : 'border-l border-[#e8dcd0]'}`}>
               <div className="flex h-full flex-col justify-between p-6">
                 
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-[#faf2e9] pb-4">
                   <h3 className="text-md font-extrabold text-[#2f251e] flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5 text-[#ff7c5c]" />
-                    <span>حقيبة المشتريات والطلب</span>
+                    <span>{t.cart_title}</span>
                   </h3>
                   <button 
                     onClick={() => {
                       setIsCartOpen(false);
                       setIsCheckingOut(false);
                     }}
-                    className="text-gray-400 hover:text-gray-600 font-bold"
+                    className="text-gray-400 hover:text-gray-650 font-bold"
                   >
                     ✕
                   </button>
@@ -620,106 +665,118 @@ export default function PublicStore({
                   {!isCheckingOut ? (
                     /* CART PRODUCTS LIST */
                     cart.length === 0 ? (
-                      <div className="p-12 text-center text-gray-400 text-xs">سلة التسوق فارغة حالياً. اضف بعض المنتجات للرضيع للبدء.</div>
+                      <div className="p-12 text-center text-gray-400 text-xs">{t.cart_empty}</div>
                     ) : (
-                      cart.map((item) => (
-                        <div key={item.product.id} className="flex gap-4 p-3 rounded-2xl bg-[#faf6f2]/80 border border-[#ecdcc9]/50 hover:bg-[#faf6f2]">
-                          <img className="h-14 w-14 object-cover rounded-xl" src={item.product.imageUrl} alt="" />
-                          <div className="flex-1">
-                            <h4 className="text-xs font-bold text-gray-900 line-clamp-1">{item.product.title}</h4>
-                            <div className="text-[10px] text-orange-600 font-bold mt-0.5">الفئة العمرية: {item.product.ageGroup || 'حديث الولادة'}</div>
-                            
-                            <div className="flex items-center justify-between mt-3">
-                              <span className="text-xs font-bold text-[#ff7c5c] font-mono">{item.product.price * item.quantity} {config.targetCurrency}</span>
+                      cart.map((item) => {
+                        const itemDetails = getProductDetails(item.product, language);
+                        const itemPrices = getProductPrices(item.product, config.markupMultiplier, selectedCountry, language);
+
+                        return (
+                          <div key={item.product.id} className="flex gap-4 p-3 rounded-2xl bg-[#faf6f2]/80 border border-[#ecdcc9]/50 hover:bg-[#faf6f2]">
+                            <img className="h-14 w-14 object-cover rounded-xl" src={item.product.imageUrl} alt="" referrerPolicy="no-referrer" />
+                            <div className="flex-1">
+                              <h4 className="text-xs font-bold text-gray-900 line-clamp-1">{itemDetails.title}</h4>
+                              <div className="text-[10px] text-orange-600 font-bold mt-0.5">{t.age_group_cart}: {itemDetails.ageGroup}</div>
                               
-                              <div className="flex items-center gap-2">
-                                <button 
-                                  onClick={() => updateCartQuantity(item.product.id, item.quantity - 1)}
-                                  className="h-6 w-6 rounded bg-white hover:bg-gray-100 border text-xs"
-                                >
-                                  -
-                                </button>
-                                <span className="text-xs font-bold font-mono">{item.quantity}</span>
-                                <button 
-                                  onClick={() => updateCartQuantity(item.product.id, item.quantity + 1)}
-                                  className="h-6 w-6 rounded bg-white hover:bg-gray-100 border text-xs"
-                                >
-                                  +
-                                </button>
-                                <button 
-                                  onClick={() => removeFromCart(item.product.id)}
-                                  className="text-rose-600 hover:text-rose-800 mr-2"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
+                              <div className="flex items-center justify-between mt-3">
+                                <div>
+                                  <div className="text-xs font-bold text-[#ff7c5c] font-mono">
+                                    ${(itemPrices.usdRetailPrice * item.quantity).toFixed(2)} USD
+                                  </div>
+                                  <div className="text-[10px] text-gray-500 font-bold">
+                                    ({(itemPrices.localPrice * item.quantity).toFixed(selectedCountry.code === 'KW' ? 3 : 1)} {language === 'ar' ? selectedCountry.currency : selectedCountry.currencyEn})
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  <button 
+                                    onClick={() => updateCartQuantity(item.product.id, item.quantity - 1)}
+                                    className="h-6 w-6 rounded bg-white hover:bg-gray-100 border text-xs font-bold flex items-center justify-center cursor-pointer"
+                                  >
+                                    -
+                                  </button>
+                                  <span className="text-xs font-bold font-mono">{item.quantity}</span>
+                                  <button 
+                                    onClick={() => updateCartQuantity(item.product.id, item.quantity + 1)}
+                                    className="h-6 w-6 rounded bg-white hover:bg-gray-100 border text-xs font-bold flex items-center justify-center cursor-pointer"
+                                  >
+                                    +
+                                  </button>
+                                  <button 
+                                    onClick={() => removeFromCart(item.product.id)}
+                                    className="text-rose-600 hover:text-rose-800 ml-2 cursor-pointer"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     )
                   ) : (
                     /* CHECKOUT FORM VIEW */
                     <form onSubmit={handleCheckoutSubmit} className="space-y-4 pt-1">
                       <div className="flex items-center gap-1 text-xs text-[#8e7a6b] mb-4 bg-orange-50 border border-orange-100 p-2.5 rounded-xl">
-                        <ArrowLeft className="h-4 w-4 text-[#ff7c5c] shrink-0" />
-                        <span>يرجى كتابة معلومات الشحن والتوصيل أدناه لتأمين الدفع الفوري والمحاكاة.</span>
+                        <ArrowLeft className={`h-4 w-4 text-[#ff7c5c] shrink-0 ${language === 'en' ? 'rotate-180' : ''}`} />
+                        <span>{t.checkout_tip}</span>
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">اسم العميل الثلاثي:</label>
+                        <label className="text-xs font-bold text-gray-700 block mb-1">{t.customer_fullname}</label>
                         <input
                           type="text"
                           required
                           value={checkoutName}
-                          placeholder="مثال: يوسف بن عبدالرحمن العتيبي"
+                          placeholder={t.fullname_placeholder}
                           onChange={(e) => setCheckoutName(e.target.value)}
-                          className="w-full text-xs font-medium rounded-xl border border-[#ecdcc9] bg-white px-3 py-2 text-gray-900 focus:border-[#ff7c5c] focus:outline-none"
+                          className={`w-full text-xs font-medium rounded-xl border border-[#ecdcc9] bg-white px-3 py-2 text-gray-900 focus:border-[#ff7c5c] focus:outline-none ${language === 'ar' ? 'text-right' : 'text-left'}`}
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">رقم الهاتف الجوال للاتصال:</label>
+                        <label className="text-xs font-bold text-gray-700 block mb-1">{t.mobile_label}</label>
                         <input
                           type="tel"
                           required
                           value={checkoutPhone}
-                          placeholder="مثال: 0501234567"
+                          placeholder={t.mobile_placeholder}
                           onChange={(e) => setCheckoutPhone(e.target.value)}
-                          className="w-full text-xs font-medium rounded-xl border border-[#ecdcc9] bg-white px-3 py-2 text-gray-950 text-left tracking-wide focus:border-[#ff7c5c] focus:outline-none"
+                          className={`w-full text-xs font-medium rounded-xl border border-[#ecdcc9] bg-white px-3 py-2 text-gray-950 tracking-wide focus:border-[#ff7c5c] focus:outline-none ${language === 'ar' ? 'text-right' : 'text-left'}`}
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">البريد الإلكتروني للعميل:</label>
+                        <label className="text-xs font-bold text-gray-700 block mb-1">{t.email_label}</label>
                         <input
                           type="email"
                           required
                           value={checkoutEmail}
-                          placeholder="youssef@example.com"
+                          placeholder={t.email_placeholder}
                           onChange={(e) => setCheckoutEmail(e.target.value)}
                           className="w-full text-xs font-medium rounded-xl border border-[#ecdcc9] bg-white px-3 py-2 text-gray-950 text-left focus:border-[#ff7c5c] focus:outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">عنوان التسليم والتوصيل بالتفصيل:</label>
+                        <label className="text-xs font-bold text-gray-700 block mb-1">{t.address_label}</label>
                         <textarea
                           required
                           value={checkoutAddress}
-                          placeholder="المنطقة، المدينة، اسم الشارع ورقم المبنى (مثال: حي الياسمين، الرياض)"
+                          placeholder={t.address_placeholder}
                           onChange={(e) => setCheckoutAddress(e.target.value)}
-                          className="w-full text-xs font-medium rounded-xl border border-[#ecdcc9] bg-white px-3 py-2 text-gray-900 focus:border-[#ff7c5c] focus:outline-none h-20"
+                          className={`w-full text-xs font-medium rounded-xl border border-[#ecdcc9] bg-white px-3 py-2 text-gray-900 focus:border-[#ff7c5c] focus:outline-none h-20 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                         />
                       </div>
 
                       <div className="pt-2 border-t border-[#faf2e9]">
                         <button
                           type="submit"
-                          className="w-full rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3.5 transition-all text-center shadow-md shadow-emerald-600/10 flex items-center justify-center gap-1.5"
+                          className="w-full rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3.5 transition-all text-center shadow-md shadow-emerald-600/10 flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <Lock className="h-4 w-4" />
-                          <span>إتمام الدفع الآمن وإنهاء المشتريات</span>
+                          <span>{t.secure_checkout}</span>
                         </button>
                       </div>
                     </form>
@@ -728,22 +785,28 @@ export default function PublicStore({
 
                 {/* Subtotal & Action Footer */}
                 {!isCheckingOut && cart.length > 0 && (
-                  <div className="border-t border-[#f4eade] pt-4 mt-4 space-y-4">
+                  <div className="border-t border-[#f4eade] pt-4 mt-4 space-y-3">
+                    <div className="flex justify-between items-center text-xs text-gray-900 border-b border-[#faf2e9] pb-2">
+                      <span className="font-bold">{t.subtotal_usd}</span>
+                      <span className="text-md font-black text-[#ff7c5c] font-mono">${calculateTotalUsd().toFixed(2)} USD</span>
+                    </div>
                     <div className="flex justify-between items-center text-xs text-gray-900">
-                      <span className="font-bold">المجموع الفرعي لمنتجات الرضّع:</span>
-                      <span className="text-lg font-black text-[#ff7c5c] font-mono">{calculateTotal()} {config.targetCurrency}</span>
+                      <span className="font-bold">{t.subtotal_local}</span>
+                      <span className="text-lg font-black text-emerald-600 font-mono">
+                        {calculateTotalLocal().toFixed(selectedCountry.code === 'KW' ? 3 : 1)} {language === 'ar' ? selectedCountry.currency : selectedCountry.currencyEn}
+                      </span>
                     </div>
                     
                     <div className="text-[10px] text-emerald-800 bg-emerald-50 px-3 py-2 rounded-xl flex items-center gap-1.5 leading-relaxed">
-                      <Truck className="h-4.5 w-4.5 text-emerald-600" />
-                      <span>تهانينا! طفلك مؤهل لشحن سريع ومجاني للرضع والخليج العربي.</span>
+                      <Truck className="h-4.5 w-4.5 text-emerald-600 shrink-0" />
+                      <span>{t.qualified_free_shipping}</span>
                     </div>
 
                     <button
                       onClick={() => setIsCheckingOut(true)}
-                      className="w-full rounded-2xl bg-gradient-to-r from-[#2f251e] to-black hover:from-[#ff7c5c] hover:to-[#ff7c5c] hover:text-white text-white font-extrabold text-xs py-3.5 transition-all flex items-center justify-center gap-2 shadow-md shadow-[#2f251e]/15"
+                      className="w-full rounded-2xl bg-gradient-to-r from-[#2f251e] to-black hover:from-[#ff7c5c] hover:to-[#ff7c5c] hover:text-white text-white font-extrabold text-xs py-3.5 transition-all flex items-center justify-center gap-2 shadow-md shadow-[#2f251e]/15 cursor-pointer"
                     >
-                      <span>الانتقال لإرسال الطلب وإدخال الفواتير</span>
+                      <span>{t.proceed_to_checkout}</span>
                       <Lock className="h-4 w-4 shrink-0" />
                     </button>
                   </div>
