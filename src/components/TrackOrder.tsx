@@ -78,23 +78,23 @@ export default function TrackOrder() {
       {
         key: 'pending',
         title: 'تأكيد الطلب المبدئي',
-        desc: 'تم تسجيل طلب الرضيع ودخل بوابتنا للتدوين المالي والربط والتحقق.',
+        desc: 'تم تسجيل طلب الرضيع بنجاح ودخل نظام التدقيق والتعقيم.',
         icon: Clock,
         activeColor: 'text-amber-500 bg-amber-50 border-amber-300',
         doneColor: 'text-emerald-600 bg-emerald-50 border-emerald-500'
       },
       {
         key: 'processing',
-        title: 'تجهيز الشحنة داخلياً',
-        desc: 'يتم الآن فرز المنتجات، تعقيمها والتأكد التام من سلامة وخلو المواد من البلاستيك الضار الـ BPA.',
+        title: 'تجهيز وتعقيم الشحنة',
+        desc: 'يتم الآن فرز منتجات العناية بالطفل للتأكد من مطابقتها لأعلى معايير الأمان وخلو المواد من البلاستيك الضار الـ BPA.',
         icon: Package,
         activeColor: 'text-orange-500 bg-orange-50 border-orange-300',
         doneColor: 'text-emerald-600 bg-emerald-50 border-emerald-500'
       },
       {
         key: 'shipped',
-        title: 'شحن ومغادرة الشاحن الشريك',
-        desc: 'الشحنة غادرت بلد المنشأ باتجاه جمرك الخليج العربي آلياً عبر AliExpress Direct / CJ.',
+        title: 'مغادرة الشحنة والترانزيت',
+        desc: 'تم نقل الشحنة وتسليمها لخط الطيران الدولي المباشر المتجه إلى الخليج العربي.',
         icon: Truck,
         activeColor: 'text-blue-500 bg-blue-50 border-blue-300',
         doneColor: 'text-emerald-600 bg-emerald-50 border-emerald-500'
@@ -133,13 +133,13 @@ export default function TrackOrder() {
       <div className="text-center mb-10 max-w-lg mx-auto">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ff7c5c]/10 text-[#ff7c5c] px-3.5 py-1 text-[11px] font-bold border border-[#ff7c5c]/20 mb-3">
           <Sparkles className="h-3 w-3" />
-          <span>تتبع لوجستي داخلي مدمج ومتصل مع الموردين</span>
+          <span>تتبع شحنات سحاب للأطفال الفورية</span>
         </span>
         <h2 className="text-2xl font-extrabold text-[#2f251e] sm:text-3xl tracking-tight leading-snug">
           بوابة تتبع طلبات سحاب الذكية للأطفال
         </h2>
         <p className="mt-2.5 text-xs text-[#8e7a6b] leading-relaxed font-medium">
-          أدخلي كود تتبع الطلب الخاص بطفلك والمكون من (SAB-2026-XXXX) الذي تلقيتِه في نهاية الفاتورة لمشاهدة حالة الشحنة والربط اللوجستي الآني مباشرة في سحابتنا.
+          أدخلي كود تتبع الطلب الخاص بطفلك والمكون من (SAB-2026-XXXX) الذي تلقيتِه في نهاية الفاتورة لمشاهدة حالة الشحنة فوراً مباشرة في متجرنا بالتفصيل.
         </p>
       </div>
 
@@ -202,8 +202,8 @@ export default function TrackOrder() {
                 </span>
                 <span>|</span>
                 <span className="flex items-center gap-1">
-                  <span className="text-orange-500 font-extrabold">المورد اللوجستي:</span>
-                  <span>{trackedOrder.dropshipSource || "AliExpress"}</span>
+                  <span className="text-orange-500 font-extrabold">طريقة التوصيل:</span>
+                  <span>توصيل منزلي سريع وآمن</span>
                 </span>
               </div>
             </div>
@@ -273,14 +273,14 @@ export default function TrackOrder() {
             {trackedOrder.trackingNumber && (
               <div className="mt-8 pt-6 border-t border-dashed border-[#ecdcc9] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div className="text-xs text-[#8e7a6b] font-medium leading-relaxed">
-                  📦 <strong>رمز تتبع المورد الشريك:</strong> يمكنك استخدام هذا الكود للتتبع المحلي في مكاتب البريد الخليجية بمجرد تخطي الشحنة حواجز الجمرك:
+                  📦 <strong>رمز الشحنة الدولي:</strong> يمكنك استخدام هذا الرمز لتتبع طرد طفلك مع شركات التوصيل المحلية بمجرد وصوله للمملكة/الخليج:
                 </div>
                 <div className="flex items-center gap-1 bg-[#fdf8f4] border border-[#f0ded0] rounded-xl p-1 shrink-0">
                   <span className="text-xs font-mono font-bold text-[#ff7c5c] px-3.5">{trackedOrder.trackingNumber}</span>
                   <button 
                     onClick={() => copyToClipboard(trackedOrder.trackingNumber || "")}
                     className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-[#e8dcd0] text-gray-500 hover:text-[#ff7c5c] transition-all"
-                    title="نسخ رقم التتبع"
+                    title="نسخ الرمز"
                   >
                     <Clipboard className="h-4 w-4" />
                   </button>

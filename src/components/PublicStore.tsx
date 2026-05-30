@@ -59,7 +59,7 @@ export default function PublicStore({
   // Static/preset reviews to display
   const presetReviews = [
     { author: "أم يوسف - الرياض", text: "الخامة جداً ناعمة وخالية من المواد الكيمائية الضارة، طفلي يرتاح جداً بالمنتج وسهلة التعقيم والمسح الصاروخي.", rating: 5, date: "قبل ٣ أيام" },
-    { author: "ماريا • دبي", text: "مذهل ومربوط مع AliExpress بجودة تطابق الصور بنسبة 100٪. سأشتري قطعاً أخرى قريباً.", rating: 5, date: "قبل أسبوع" },
+    { author: "ماريا • دبي", text: "الخامات رائعة والقطع ناعمة جداً على بشرة طفلي وجاءت مغلفة بقمة الأناقة والصحة. سأطلب كميات أخرى قريباً.", rating: 5, date: "قبل أسبوع" },
     { author: "سارة العتيبي - جدة", text: "أكثر ما يعجبني هو تفاصيل حماية الأمن والسلامة للرضع، خفيف والعلب آمنة وخالية من المود الضارة تماماً.", rating: 5, date: "قبل يومين" }
   ];
 
@@ -203,7 +203,7 @@ export default function PublicStore({
             العناية الغيمية الهادئة بجيل الغد الفاخر
           </h2>
           <p className="mt-4 text-xs sm:text-sm text-[#7e6b5c] leading-relaxed max-w-lg">
-            نوفر في <span className="font-bold text-[#ff7c5c]">سحاب للأطفال</span> باقة مستوردة بعناية وموثوقية فائقة مباشرة من كبرى مستودعات الموردين المعتمدين لصحة طفلك واطمئنانك.
+            نوفر في <span className="font-bold text-[#ff7c5c]">سحاب للأطفال</span> باقة منتقاة بعناية وموثوقية فائقة من مستلزمات العناية وألعاب الرضع الطبيعية المصممة خصيصاً لصحة طفلك واطمئنانك.
           </p>
           
           <div className="mt-6 flex flex-wrap gap-4 text-[11px] font-bold text-[#6c594c]">
@@ -238,22 +238,9 @@ export default function PublicStore({
           ))}
         </div>
 
-        {/* Source Platform Filter */}
-        <div className="flex items-center gap-1.5 bg-white border border-[#ecdcc9] p-1 rounded-xl">
-          <span className="text-[10px] font-extrabold text-[#8e7a6b] px-2 block">المورد الشريك:</span>
-          {['الكل', 'AliExpress', 'CJDropshipping'].map((src) => (
-            <button
-              key={src}
-              onClick={() => setSelectedSource(src)}
-              className={`rounded-lg px-2.5 py-1 text-[10px] font-bold transition-all ${
-                selectedSource === src
-                  ? 'bg-[#ff7c5c] text-white'
-                  : 'text-[#6c594c] hover:bg-gray-100'
-              }`}
-            >
-              {src === 'الكل' ? 'الكل' : src}
-            </button>
-          ))}
+        {/* Filter Indicator */}
+        <div className="flex items-center gap-1.5 bg-white border border-[#ecdcc9] px-3 py-2 rounded-xl">
+          <span className="text-[10px] font-extrabold text-[#8e7a6b]">تشكيلة حصرية فاخرة للأمهات</span>
         </div>
       </div>
 
@@ -302,16 +289,9 @@ export default function PublicStore({
                 {/* Safety Badge */}
                 {p.safetyRating && (
                   <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-lg bg-emerald-50/90 backdrop-blur-md border border-emerald-100 px-2 py-1 text-[9px] font-bold text-emerald-800">
-                    🛡️ {p.safetyRating.split(' ')[0]} أوض عالي
+                    🛡️ {p.safetyRating.split(' ')[0]} جودة معتمدة
                   </span>
                 )}
-
-                {/* Platform import indicator so shippers see dropship live sync */}
-                <span className={`absolute top-2.5 left-2.5 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[9px] font-bold text-white shadow-xs ${
-                  p.source === 'AliExpress' ? 'bg-[#ea1c24]' : 'bg-[#e09100]'
-                }`}>
-                  {p.source}
-                </span>
 
               </div>
 
@@ -526,7 +506,7 @@ export default function PublicStore({
             <div className="mt-8 pt-6 border-t border-[#e8dcd0]">
               <h4 className="text-xs uppercase font-extrabold tracking-wider text-[#a49182] mb-4 flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
-                <span>تقييمات الأمهات الموثقة من AliExpress & CJ</span>
+                <span>الآراء والتقييمات الموثقة من الأمهات</span>
               </h4>
 
               {/* Write a review box */}
@@ -647,7 +627,7 @@ export default function PublicStore({
                           <img className="h-14 w-14 object-cover rounded-xl" src={item.product.imageUrl} alt="" />
                           <div className="flex-1">
                             <h4 className="text-xs font-bold text-gray-900 line-clamp-1">{item.product.title}</h4>
-                            <div className="text-[10px] text-orange-600 font-bold mt-0.5">مورد {item.product.source} • {item.product.ageGroup}</div>
+                            <div className="text-[10px] text-orange-600 font-bold mt-0.5">الفئة العمرية: {item.product.ageGroup || 'حديث الولادة'}</div>
                             
                             <div className="flex items-center justify-between mt-3">
                               <span className="text-xs font-bold text-[#ff7c5c] font-mono">{item.product.price * item.quantity} {config.targetCurrency}</span>
