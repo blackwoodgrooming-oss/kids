@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, ShoppingBag, Star, Shield, 
   Truck, Heart, HelpCircle, ChevronRight, 
@@ -42,6 +42,11 @@ export default function PublicStore({
   // Product Details Modal state
   const [selectedProduct, setSelectedProduct] = useState<BabyProduct | null>(null);
   const [likedProducts, setLikedProducts] = useState<string[]>([]);
+  const [activeMedia, setActiveMedia] = useState<'image' | 'video'>('image');
+
+  useEffect(() => {
+    setActiveMedia('image');
+  }, [selectedProduct?.id]);
   
   // Interactive checkout view within cart
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -435,14 +440,61 @@ export default function PublicStore({
               
               {/* Product Media */}
               <div>
-                <div className="aspect-square w-full overflow-hidden rounded-2xl bg-[#faf6f2] border border-gray-150">
-                  <img
-                    src={selectedProduct.imageUrl}
-                    alt={selectedProductDetails.title}
-                    className="h-full w-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
+                <div className="aspect-square w-full overflow-hidden rounded-2xl bg-[#faf6f2] border border-gray-150 relative">
+                  {selectedProduct.videoUrl && activeMedia === 'video' ? (
+                    <video
+                      src={selectedProduct.videoUrl}
+                      controls
+                      autoPlay
+                      playsInline
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={selectedProduct.imageUrl}
+                      alt={selectedProductDetails.title}
+                      className="h-full w-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
                 </div>
+
+                {/* Media Switcher (Image / Video) if video exists */}
+                {selectedProduct.videoUrl && (
+                  <div className="flex gap-2.5 mt-3 justify-center">
+                    <button
+                      onClick={() => setActiveMedia('image')}
+                      className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${
+                        activeMedia === 'image' ? 'border-[#ff7c5c] ring-2 ring-[#ff7c5c]/20' : 'border-[#e8dcd0]'
+                      }`}
+                    >
+                      <img
+                        src={selectedProduct.imageUrl}
+                        alt="Product Image"
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </button>
+                    <button
+                      onClick={() => setActiveMedia('video')}
+                      className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 bg-black flex items-center justify-center transition-all ${
+                        activeMedia === 'video' ? 'border-[#ff7c5c] ring-2 ring-[#ff7c5c]/20' : 'border-[#e8dcd0]'
+                      }`}
+                    >
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+                        <span className="text-white bg-[#ff7c5c] px-1.5 py-0.5 rounded font-extrabold text-[9px] uppercase tracking-wider">
+                          فيديو / VIDEO
+                        </span>
+                      </div>
+                      <img
+                        src={selectedProduct.imageUrl}
+                        alt="Video Thumbnail"
+                        className="w-full h-full object-cover opacity-65"
+                        referrerPolicy="no-referrer"
+                      />
+                    </button>
+                  </div>
+                )}
 
                 {/* Safety certification disclaimer bottom of media */}
                 <div className="mt-4 p-3.5 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-2xl text-[11px] leading-relaxed">

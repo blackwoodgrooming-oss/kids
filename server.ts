@@ -282,59 +282,8 @@ function writeOrdersToDisk(ordersList: any[]) {
 
 // Supabase helper functions
 async function getProductsDB(): Promise<any[]> {
-  const localProducts = readProductsFromDisk();
-  if (!supabase) return localProducts;
-  try {
-    const { data, error } = await supabase.from("products").select("*");
-    if (error) {
-      console.warn("Supabase products table lookup failed. Using local products.json fallback...", error.message);
-      return localProducts;
-    }
-    if (data && data.length > 0) {
-      return data.map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        titleEn: item.title_en || item.titleEn,
-        description: item.description,
-        price: Number(item.price),
-        priceUsd: Number(item.price_usd || item.priceUsd || 10),
-        source: item.source || "Manual",
-        sourceUrl: item.source_url || item.sourceUrl || "",
-        imageUrl: item.image_url || item.imageUrl || "",
-        category: item.category,
-        stock: Number(item.stock || 100),
-        ageGroup: item.age_group || item.ageGroup || "0-3 سنوات",
-        safetyRating: item.safety_rating || item.safetyRating || "خامات صحية معتمدة",
-        features: Array.isArray(item.features) ? item.features : JSON.parse(item.features || "[]"),
-        specs: typeof item.specs === "object" ? item.specs : JSON.parse(item.specs || "{}")
-      }));
-    } else {
-      // Seed table on first connection
-      console.log("Supabase table 'products' is empty. Seeding local preset list into Supabase database...");
-      const mapped = localProducts.map((p) => ({
-        id: p.id,
-        title: p.title,
-        title_en: p.titleEn || "",
-        description: p.description,
-        price: p.price,
-        price_usd: p.priceUsd,
-        source: p.source,
-        source_url: p.sourceUrl,
-        image_url: p.imageUrl,
-        category: p.category,
-        stock: p.stock,
-        age_group: p.ageGroup,
-        safety_rating: p.safetyRating,
-        features: p.features,
-        specs: p.specs
-      }));
-      await supabase.from("products").insert(mapped);
-      return localProducts;
-    }
-  } catch (err) {
-    console.warn("Supabase products integration error, defaulting to offline disk database:", err);
-    return localProducts;
-  }
+  // Always load directly from local products.json on disk to respect manual product list curation
+  return readProductsFromDisk();
 }
 
 async function getOrdersDB(): Promise<any[]> {

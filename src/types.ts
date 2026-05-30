@@ -8,6 +8,7 @@ export interface BabyProduct {
   source: 'AliExpress' | 'CJDropshipping' | 'Manual';
   sourceUrl: string;
   imageUrl: string;
+  videoUrl?: string;
   category: string;
   stock: number;
   ageGroup: string;
