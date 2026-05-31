@@ -160,7 +160,9 @@ export default function App() {
                 <Cloud className="h-6 w-6 text-[#ff7c5c] animate-float" />
                 <span className="font-extrabold text-[#faf2e9] text-md">{t.brand_main} {language === 'ar' ? '' : t.brand_sub}</span>
               </div>
-              <p className="text-[10px] text-[#a49182] mt-1">{t.footer_p1}</p>
+              <p className="text-[10px] text-[#a49182] mt-1">
+                {t.footer_p1} <span className="opacity-40 px-1 hidden md:inline">|</span> <span className="block md:inline-block text-[#c8b6a3]/70">{t.company_address}</span>
+              </p>
             </div>
             
             <div className="flex items-center gap-4 text-[11px] font-semibold text-[#c8b6a3]">
