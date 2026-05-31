@@ -39,11 +39,11 @@
     "priceUsd": 12.30,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005011832106569.html",
-    "imageUrl": "/src/assets/images/pit_balls_main_1780224560494.png",
+    "imageUrl": "/assets/images/pit_balls_main_1780224560494.png",
     "images": [
-      "/src/assets/images/pit_balls_main_1780224560494.png",
-      "/src/assets/images/pit_balls_pool_1780224580504.png",
-      "/src/assets/images/pit_balls_detail_1780224599907.png"
+      "/assets/images/pit_balls_main_1780224560494.png",
+      "/assets/images/pit_balls_pool_1780224580504.png",
+      "/assets/images/pit_balls_detail_1780224599907.png"
     ],
     "category": "ألعاب تعليمية وتنمية مهارات",
     "stock": 250,
@@ -69,11 +69,11 @@
     "priceUsd": 21.14,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005011801458664.html",
-    "imageUrl": "/src/assets/images/ice_cream_bubble_maker_main_1780225208749.png",
+    "imageUrl": "/assets/images/ice_cream_bubble_maker_main_1780225208749.png",
     "images": [
-      "/src/assets/images/ice_cream_bubble_maker_main_1780225208749.png",
-      "/src/assets/images/ice_cream_bubble_maker_kids_1780225233455.png",
-      "/src/assets/images/ice_cream_bubble_maker_accessories_1780225251670.png"
+      "/assets/images/ice_cream_bubble_maker_main_1780225208749.png",
+      "/assets/images/ice_cream_bubble_maker_kids_1780225233455.png",
+      "/assets/images/ice_cream_bubble_maker_accessories_1780225251670.png"
     ],
     "category": "ألعاب تعليمية وتنمية مهارات",
     "stock": 190,
@@ -99,11 +99,11 @@
     "priceUsd": 8.23,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005007450509338.html",
-    "imageUrl": "/src/assets/images/baby_earmuffs_main_1780225586781.png",
+    "imageUrl": "/assets/images/baby_earmuffs_main_1780225586781.png",
     "images": [
-      "/src/assets/images/baby_earmuffs_main_1780225586781.png",
-      "/src/assets/images/baby_earmuffs_sleeping_1780225611800.png",
-      "/src/assets/images/baby_earmuffs_features_1780225634095.png"
+      "/assets/images/baby_earmuffs_main_1780225586781.png",
+      "/assets/images/baby_earmuffs_sleeping_1780225611800.png",
+      "/assets/images/baby_earmuffs_features_1780225634095.png"
     ],
     "category": "رعاية وصحة الرضع",
     "stock": 350,
@@ -129,11 +129,11 @@
     "priceUsd": 11.76,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005009012151267.html",
-    "imageUrl": "/src/assets/images/ball_pit_main_1780225924396.png",
+    "imageUrl": "/assets/images/ball_pit_main_1780225924396.png",
     "images": [
-      "/src/assets/images/ball_pit_main_1780225924396.png",
-      "/src/assets/images/ball_pit_kids_1780225944934.png",
-      "/src/assets/images/ball_pit_details_1780225965851.png"
+      "/assets/images/ball_pit_main_1780225924396.png",
+      "/assets/images/ball_pit_kids_1780225944934.png",
+      "/assets/images/ball_pit_details_1780225965851.png"
     ],
     "category": "ألعاب تعليمية وتنمية مهارات",
     "stock": 320,
@@ -159,11 +159,11 @@
     "priceUsd": 10.69,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005010182881382.html",
-    "imageUrl": "/src/assets/images/my_melody_basket_main_1780226402486.png",
+    "imageUrl": "/assets/images/my_melody_basket_main_1780226402486.png",
     "images": [
-      "/src/assets/images/my_melody_basket_main_1780226402486.png",
-      "/src/assets/images/my_melody_basket_lifestyle_1780226417414.png",
-      "/src/assets/images/my_melody_basket_details_1780226435569.png"
+      "/assets/images/my_melody_basket_main_1780226402486.png",
+      "/assets/images/my_melody_basket_lifestyle_1780226417414.png",
+      "/assets/images/my_melody_basket_details_1780226435569.png"
     ],
     "category": "مستلزمات النوم والراحة",
     "stock": 180,
