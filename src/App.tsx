@@ -4,10 +4,11 @@ import PublicStore from './components/PublicStore';
 import TrackOrder from './components/TrackOrder';
 import { BabyProduct, Order, ImportConfig, CountryOption, countryOptions, translations } from './types';
 import { Cloud } from 'lucide-react';
+import localProductsPreset from '../products.json';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'store' | 'track'>('store');
-  const [products, setProducts] = useState<BabyProduct[]>([]);
+  const [products, setProducts] = useState<BabyProduct[]>(localProductsPreset);
   const [cart, setCart] = useState<{ product: BabyProduct; quantity: number }[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,14 +52,25 @@ export default function App() {
   // Fetch initial products and orders from server database (Supabase backed)
   useEffect(() => {
     const loadData = async () => {
+      let productsLoaded = false;
       try {
         // Load persistent products from server
         const response = await fetch('/api/products');
         const data = await response.json();
-        if (data && data.products) {
+        if (data && data.products && data.products.length > 0) {
           setProducts(data.products);
+          productsLoaded = true;
         }
+      } catch (err) {
+        console.warn("Could not load products from server/API, using local static preset. Error:", err);
+      }
 
+      if (!productsLoaded) {
+        console.log("Setting products to localProductsPreset fallback");
+        setProducts(localProductsPreset);
+      }
+
+      try {
         // Load persistent orders from server database
         const ordersResponse = await fetch('/api/orders');
         const ordersData = await ordersResponse.json();
@@ -66,7 +78,7 @@ export default function App() {
           setOrders(ordersData.orders);
         }
       } catch (err) {
-        console.error("Error loading deep store data:", err);
+        console.error("Error loading deep store orders:", err);
       } finally {
         setIsLoading(false);
       }

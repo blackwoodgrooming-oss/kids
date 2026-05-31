@@ -8,6 +8,7 @@ export interface BabyProduct {
   source: 'AliExpress' | 'CJDropshipping' | 'Manual';
   sourceUrl: string;
   imageUrl: string;
+  images?: string[];
   videoUrl?: string;
   category: string;
   stock: number;
@@ -73,42 +74,112 @@ export const countryOptions: CountryOption[] = [
 ];
 
 export const productTranslations: { [productId: string]: any } = {
-  "suction_cup_spinners": {
-    title: "Baby Suction Cup Spinner Bath Toys Set - 3pcs Colorful Cartoon Toys",
-    description: "Interactive spinning toys with strong suction caps that easily attach to bathtubs, windows, or high chairs. Made of high-quality, non-toxic BPA-free ABS plastic with soft smooth edges to protect little fingers. Perfect for fine motor skills development, visual focus, and bath-time sensory entertainment with its gentle rattle sound.",
-    category: "Educational Toys & Skill Development",
-    ageGroup: "3 months and older",
-    safetyRating: "100% BPA-free food-grade silicone & ABS plastic with rounded safe edges",
+  "kids_plush_melody_basket": {
+    title: "Premium Kawaii My Melody Plush Storage Basket & Cute Snuggly Nursery Organizer",
+    description: "An incredibly snuggly, ultra-soft plush storage basket inspired by the universally beloved cartoon character My Melody. This adorable container features delightful plush rabbit ears and an elegant bow decoration, handcrafted meticulously out of premium plush velvet material to bring warmth, color, and absolute fun to your child's playroom or nursery. Ideal for organising bedroom clutter, gathering stuffed animals, diapers, newborn baby care products, socks, clothes, or favorite sweets. Extremely lightweight, highly durable, and soft-walled to protect babies from bumps while being easy to carry anywhere with cosy plush loop handles.",
+    category: "Sleep & Comfort",
+    ageGroup: "Newborn and older",
+    safetyRating: "Sanitized medical-grade plush velvet materials 100% free of bad odors, BPA, or harmful skin-irritating synthetics",
     features: [
-      "Strong suction cups stick firmly to all smooth surfaces like tiles, glass, or tubs",
-      "Smooth and lasting rotation attracts baby attention and improves hand-eye coordination",
-      "Built-in subtle rattle beads generate gentle sounds to boost sensory development",
-      "Rounded design without sharp corners, entirely safe for chewing and tactile touch"
+      "✅ Cute Sanrio Creative Theme: Irresistibly beautiful rabbit face design that kids absolutely love, transforming tidying up and gathering toys into an exciting game.",
+      "✅ 100% Edge-Free & Soft-Sided: Perfectly soft and cushioned walls with zero hard metallic wires, sharp plastic brackets, or heavy timber frames, making it extremely safe next to baby cribs.",
+      "✅ Sturdy Plush Grab Handles: Super lightweight container finished with ultra-durable padded side handles for swift carrying of laundry, clean diapers, feeding bottles, or snacks."
     ],
     specs: {
-      "Material": "Food-grade soft silicone & eco-friendly sturdy ABS plastic",
-      "Count": "3-piece cartoon shape collection (Bee, Butterfly, Ladybug)",
-      "Suitable Age": "3 months to 3 years old",
-      "Maintenance": "Washable and waterproof, simple to wipe down or sanitize with warm water"
+      "Material Construction": "Premium cloud-soft synthetic plush velvet fabric with dense skin-friendly cotton cushioning",
+      "Outer Dimensions": "Spacious 25cm height with a wide 20cm circular opening suited for versatile daily organization",
+      "Recommended Age": "Safe and recommended for kids, toddlers, and infants of all stages, including newborn prep",
+      "Washing & Care": "Wipes clean effortlessly with a moist cloth; hand-wash safe in cold water with mild baby detergent to retain luxury texture"
     }
   },
-  "imported_bath_bombs": {
-    title: "12pcs Organic Kids Bubble Bath Bombs Set with Surprise Toys",
-    description: "Effervescent organic bath bombs rich in nourishing natural butter and organic essential oils. Gentle for baby & kids skin. Each fizzy ball contains a surprise animal toy inside to make bathing an interactive, fun, and relaxing experience right before bedtime sleep.",
-    category: "Baby Care & Health",
-    ageGroup: "1 year - 8 years",
-    safetyRating: "Tear-free hypoallergenic natural ingredients & BPA-free toys",
+  "kids_portable_ball_pit": {
+    title: "Portable Pop-Up Hexagonal Ball Pit Play Tent for Kids & Toddlers",
+    description: "An incredibly convenient, lightweight, and automatically unfolding pop-up play tent and ocean ball pit design for infants. Modeled with a classic hexagonal frame and decorated with a colorful, bright polka dots print that boosts your child's visual imagination. Made from super durable, tear-resistant Oxford fabric with a highly flexible coated steel wire support structure. Highly versatile for indoor nurseries or outdoor picnic/garden environments, collapsing down flat in seconds into its smart zippered carry bag.",
+    category: "Educational & Skill Toys",
+    ageGroup: "6 months and older",
+    safetyRating: "Eco-friendly, wash-safe polyester material with heavy-duty coated steel wire structures completely free of toxic finishes",
     features: [
-      "100% natural and gentle essential oils safe for kid's skin care",
-      "Contains 12 fun animal capsule toys hidden inside",
-      "Softens skin with organic sweet almond oil and sea minerals",
-      "No chemical pigments - completely stain-free and safe for bathtubs"
+      "✅ Pop-Up Automatic Open: Simply unbox and release out of the handy carry bag, and the hexagonal tent unfolds instantly to create a full kids playground space.",
+      "✅ Travel-Friendly Compact Design: Ultra-portable play space folds flat into a thin circle about 30cm in diameter, taking minimal space in car trunks or baby diaper bags.",
+      "✅ Highly Durable & Easy Clean: Coated fabric repels accidental liquid spills and can be cleaned effortlessly by simply wiping with a damp cloth and warm water."
     ],
     specs: {
-      "Material": "Organic Essential Oils, Sweet Almond Oil & Sea Minerals",
-      "Count": "12 individually wrapped bath bombs with inner capsule toys",
-      "Direct Shipping": "Express tracked shipment via AliExpress Direct",
-      "Selected Option": "Ocean-Box 1"
+      "What is Included": "One Pop-up hexagonal ball pit tent with a branded matching zippered round carry pouch",
+      "Fabric & Materials": "Flexible high-elastic coated steel wires wrapped in heavy-duty waterproof polyester fabric",
+      "Product Dimensions": "Spacious 100cm outer diameter with a safe 30cm wall height that prevents plastic play balls from rolling out",
+      "Key Benefits": "Increases infant sensory responses, stores toys cleanly, and establishes an active playing territory"
+    }
+  },
+  "kids_baby_earmuffs": {
+    title: "Premium Baby Noise Reduction Earmuffs & Sleep Hearing Protection",
+    description: "Extremely comfortable and ultra-gentle baby noise-reducing earmuffs designed specifically for newborn infants and toddlers. Featuring a wide, stretchable headband made of cloud-like soft cotton and silk that distributes pressure evenly, preventing headaches or discomfort on your child's delicate head. Perfect for blocking loud environmental noise and ensuring sound, peaceful sleep during flights, road trips, family gatherings, loud fireworks, and crowded events.",
+    category: "Baby Care & Health",
+    ageGroup: "Newborn and older",
+    safetyRating: "BPA-free medical-grade noise protection materials with dynamic zero-pressure elastic safety headband",
+    features: [
+      "✅ Premium Hearing Protection: Highly efficient noise-damping earmuffs engineered to block out harmful loud sounds, preventing startle responses and ensuring continuous quiet sleep.",
+      "✅ Cloud-Like Elastic Headband: Seamlessly adjustable stretchy headband with soft velcro secure straps that fits snug and cozy without squeezing your toddler's developing skull.",
+      "✅ Cool & Breathable Comfort: Soft cushy ear pads covered in breathable premium faux-leather, preventing sweat build-up and ensuring supreme wearability during hours-long sleep."
+    ],
+    specs: {
+      "Material Construction": "Medical-grade sound-absorbing ABS shell with deep high-density foam padding and skin-friendly ear pads",
+      "Headband Feature": "Super elastic, washable, ultra-soft silk cotton band with adjustable fasteners",
+      "Recommended Age": "Ideal for babies, toddlers, and infants from 0 months up to 3 years old",
+      "Usage Occasions": "Perfect for airport transit, street noises, weddings, movies, sports games, and any noisy neighborhood"
+    }
+  },
+  "kids_ice_cream_bubble_maker": {
+    title: "Ice Cream Shaped Bath Bubble Maker Foam Machine Toy for Toddlers & Kids",
+    description: "An incredibly fun and unique ice cream themed bath bubble maker toy for kids to turn every bath-time into a foamy playground adventure! Simply pour normal baby body wash or liquid soap mixed with water into the top, and pull the lever to create tall mountains of fluffy white foam that children can catch in the included play ice cream cones. Easily mounts onto bathtub or bathroom tiles with high-strength suction cups, operating fully manually with no batteries required for safe, immersive sensory play.",
+    category: "Educational & Skill Toys",
+    ageGroup: "2 years and older",
+    safetyRating: "BPA-free medical-grade ABS plastic with ultra-smooth child safe rounded corners and no battery hazards",
+    features: [
+      "✅ Ice Cream Simulation Foam: Pour baby body wash mixed with water, pull the lever, and watch rich fluffy foam pour out like real soft-serve ice cream onto the cute toy cones.",
+      "✅ Powerful Suction Cups: Anchored with 4 high-strength suction cups on the back to attach firmly and safely to smooth tile surfaces and bathtub walls.",
+      "✅ Battery-Free Mechanics: Safely hand-driven design with no batteries, wires or water leakage hazards, providing a 100% kid-safe water play environment."
+    ],
+    specs: {
+      "Included Accessories": "Bubble ice cream maker machine and 4 colorful plastic toy waffle cones",
+      "Material Composition": "High-impact, durable food-safe ABS plastic meeting international toddler play standards",
+      "Working Principle": "Fully manual mechanical lever with no electrical currents or batteries needed",
+      "Key Benefit": "Develops fine motor hand coordination and helps anxious toddlers enjoy bathing through interactive fun"
+    }
+  },
+  "kids_ocean_balls_100pc": {
+    title: "100 Pcs Colorful Soft Plastic Ocean Pit Balls for Kids Play Tents, Pools & Air Tents",
+    description: "High-quality, eco-friendly colorful soft playing balls perfect for filling ball pits, play tents, playhouses, and kids' pools. Manufactured from elastic, non-toxic BPA-free plastic material to guarantee total safety for infants. Smooth rounded surfaces without sharp edges and premium crush-proof design make them a perfect sensory interactive toy to build motor skills & coordination.",
+    category: "Educational & Skill Toys",
+    ageGroup: "1 year and older",
+    safetyRating: "BPA-free & Phthalate-free food grade elastic plastic material, bite-resistant and highly durable",
+    features: [
+      "✅ Safe & Healthy Material: Made of food-grade virgin plastic, completely BPA and phthalate-free. Fully safe for kids to touch, bite and squeeze without any skin irritation or harm.",
+      "✅ Crush-Proof & Elasticity: Features advanced pressure-resistant technology. Play balls easily withstand heavy crushing and automatically pop back to their full round shape when released.",
+      "✅ Ultra-Smooth & Light: Smoothly polished surfaces with integrated molding prevent sharp edges or seams from scratching soft skin, with ultra-light weight for easy grasping and safe throw play."
+    ],
+    specs: {
+      "Quantity & Pack": "100 pcs colorful play balls in a reusable premium mesh storage bag",
+      "Color Palette": "Macaron and vibrant pastel mixed colors (pink, gray, blue, white, yellow, green)",
+      "Size & Diameter": "Ideal 5.5 cm size carefully designed for toddlers' little hands to avoid choking risks",
+      "Usage Applications": "Perfect for filling play tents, pools, commercial play yards, and outdoor active sports"
+    }
+  },
+  "kids_ocean_bath_bombs": {
+    title: "12 Pcs Kids Ocean Bath Bomb Gift Set with Hidden Toys for Foot & Body Bubbles",
+    description: "Delightful effervescent organic kids bath bombs rich in nourishing sea minerals and essential fruit oils. Safe and mild for sensitive baby & toddler skin. Each colorful fizzy ball conceals a cute surprise toy inside that pops out when dissolved, turning bath-time into an educational, relaxing, and highly sensory bedtime routine.",
+    category: "Baby Care & Health",
+    ageGroup: "3 years and older",
+    safetyRating: "Tear-free hypoallergenic natural ingredients & non-toxic BPA-free toys",
+    features: [
+      "✅ Surprise Bath Time: Each bath bomb contains a cute and unique sea toy (such as a shark, dolphin, octopus, etc.). Place it in water and watch it fizz and release colorful bubbles, then discover the hidden toy—turning bath time into a fun adventure that gets children excited for the bath!",
+      "✅ 12 Scents Formula: Infused with natural essential oils (vanilla, seaweed, milk, gardenia, rose, cherry blossom, mint, orange, ylang-ylang, jasmine, osmanthus, lavender). Rich, skin-safe aromas that hydrate and soothe during bathing.",
+      "✅ Safe and Gentle on Skin: Made from natural ingredients, with no harsh dyes or chemicals. Perfect for children's sensitive skin."
+    ],
+    specs: {
+      "Total Weight": "A Set - net weight with sea flower and fruit extracts",
+      "Material": "Natural skin-softening oils, warm soothing sea minerals",
+      "Count": "12 separately sealed fizzy bath bombs",
+      "Themed Style": "Land Sea Air collection with immersive surprise capsule toys"
     }
   },
   "preset_1": {

@@ -43,9 +43,15 @@ export default function PublicStore({
   const [selectedProduct, setSelectedProduct] = useState<BabyProduct | null>(null);
   const [likedProducts, setLikedProducts] = useState<string[]>([]);
   const [activeMedia, setActiveMedia] = useState<'image' | 'video'>('image');
+  const [selectedImgUrl, setSelectedImgUrl] = useState<string>('');
 
   useEffect(() => {
     setActiveMedia('image');
+    if (selectedProduct) {
+      setSelectedImgUrl(selectedProduct.imageUrl);
+    } else {
+      setSelectedImgUrl('');
+    }
   }, [selectedProduct?.id]);
   
   // Interactive checkout view within cart
@@ -67,16 +73,86 @@ export default function PublicStore({
   // Categories list keys (original Arabic terms to keep filtration working)
   const categoryKeys = ['الكل', 'أدوات الرضاعة والتغذية', 'ألعاب تعليمية وتنمية مهارات', 'رعاية وصحة الرضع', 'مستلزمات النوم والراحة'];
 
-  // Static/preset reviews to display
-  const presetReviews = language === 'ar' ? [
-    { author: "أم يوسف - الرياض", text: "الخامة جداً ناعمة وخالية من المواد الكيمائية الضارة، طفلي يرتاح جداً بالمنتج وسهلة التعقيم والمسح المباشر.", rating: 5, date: "قبل ٣ أيام" },
-    { author: "ماريا • دبي", text: "الخامات رائعة والقطع ناعمة جداً على بشرة طفلي وجاءت مغلفة بقمة الأناقة والصحة. سأطلب كميات أخرى قريباً.", rating: 5, date: "قبل أسبوع" },
-    { author: "سارة العتيبي - جدة", text: "أكثر ما يعجبني هو تفاصيل حماية الأمن والسلامة للرضع، خفيف والعلب آمنة وخالية من المواد الضارة تماماً.", rating: 5, date: "قبل يومين" }
-  ] : [
-    { author: "Um Youssef - Riyadh", text: "The material is extremely soft and completely free from hazardous chemical additions. Safe, comfortable, and easy to sterilize/wash.", rating: 5, date: "3 days ago" },
-    { author: "Maria - Dubai", text: "Excellent botanical colors and premium safety structure. Packed with high elegance and medical care. Will order more presets soon!", rating: 5, date: "1 week ago" },
-    { author: "Sarah Al-Otaibi - Jeddah", text: "I highly appreciate the deep focus on newborn safety and BPA-free certifications. Lightweight, soft peach cosmetics, and sturdy built.", rating: 5, date: "2 days ago" }
-  ];
+  // Static/preset reviews helper to display
+  const getProductPresetReviews = (productId: string, lang: 'ar' | 'en') => {
+    if (productId === 'kids_ocean_bath_bombs') {
+      return lang === 'ar' ? [
+        { author: "أم فهد - الرياض", text: "فوق الخيال! فوران ملون جميل مع ريحة الفواكه الطبيعية الفواحة، والدمى الصغيرة اللي تطلع ممتازة جداً وبنتي صارت تموت في وقت الاستحمام وبدون أي تحسس بالبشرة.", rating: 5, date: "قبل يوم" },
+        { author: "خالد بن عبد الله - جدة", text: "طلبتها لأولادي وجات مغلفة بشكل ممتاز والتغليف الحراري الفردي يحافظ عليها. جربنا عطر اللافندر والنعناع جداً مهدئ ومريح قبل النوم. والألعاب المائية لطيفة للغاية.", rating: 5, date: "قبل ٣ أيام" },
+        { author: "سارة المري - الدمام", text: "أفضل منتج كرات فوارة للأطفال الصراحة، رغوة غنية وفقاعات جميلة وألوانها ما تترك بقع على الحوض أو جسم الأطفال. والزيوت العطرية ملمسها يرطب البشرة. موصى به وبشدة!", rating: 5, date: "قبل أسبوع" },
+        { author: "ريم الخالدي - الكويت", text: "تحفة فنية للأطفال! كل يوم طفلي يختار رائحة جديدة عشان يكتشف اللعبة المخفية بالداخل، الألعاب آمنة وخالية من الـ BPA. شكراً متجر سحاب.", rating: 5, date: "قبل ٥ أيام" }
+      ] : [
+        { author: "Um Fahad - Riyadh", text: "Beyond imagination! Beautiful colored fizz with natural refreshing fruity scents. The tiny hidden toy that pops out is of great quality, my daughter now looks forward to bath time! Completely safe with no skin irritation.", rating: 5, date: "1 day ago" },
+        { author: "Khalid bin Abdullah - Jeddah", text: "Ordered these for my boys and they arrived perfectly packaged. Individually shrink-wrapped, preserving freshness. We tried the Lavender and Mint-infused ones, very soothing before sleeping. Highly creative and neat.", rating: 5, date: "3 days ago" },
+        { author: "Sarah Al-Marri - Dammam", text: "Hands down the best bath fizziness for toddlers. Rich bubble texture and the colors don't stain the tub or child's skin. The essential oil leaves skin so soft and moist. Highly recommended!", rating: 5, date: "1 week ago" },
+        { author: "Reem Al-Khalidi - Kuwait", text: "Masterpiece of clean fun! Each day my toddler chooses a new perfume to discover the hidden sea toy inside. The marine toys are safe and BPA-free. Thank you Sahab!", rating: 5, date: "5 days ago" }
+      ];
+    }
+    if (productId === 'kids_plush_melody_basket') {
+      return lang === 'ar' ? [
+        { author: "أم دانا - الرياض", text: "تجنن تجنن تبارك الرحمن! الخامة مخملية ناعمة جداً وجاءت معقمة ورائحتها نظيفة. بنتي تعشق ماي ميلودي وصارت تلم كل عرايسها وألعابها فيها الحين وصار شكل الغرفة يفتح النفس ومرتب.", rating: 5, date: "قبل ٣ أيام" },
+        { author: "أميرة الشمري - الدمام", text: "منظم راقي جداً ولطيف لغرف الأطفال. ميزتها أنها قطيفة ناعمة تماماً وبدون أي أجزاء صلبة يعني لو طاح عليها ولدي الصغير وهو يلعب ما يتأذى أبداً. الخامة ممتازة وسهلة الحمل.", rating: 5, date: "قبل يومين" },
+        { author: "ياسمين الحربي - جدة", text: "أفضل سلة تخزين طلبتها! أستخدمها لترتيب الجوارب وملابس طفلتي الصغيرة بجانب السرير، المقبض ناعم وخفيف والتوصيل سريع جداً من متجر سحاب. أنصح بها وبشدة.", rating: 5, date: "قبل يومين" }
+      ] : [
+        { author: "Um Dana - Riyadh", text: "Absolutely gorgeous! The velvet plush material is incredibly soft, arrived completely sanitized and fresh. My daughter is obsessed with My Melody and now actually loves gathering her dolls into the basket herself. Makes the nursery look so clean and stylish!", rating: 5, date: "3 days ago" },
+        { author: "Amira Al-Shammari - Dammam", text: "Premium decorative basket, very cute and practical. What I love most is that it has a completely cushiony structure with zero rigid framing, so it's 100% safe to place around playing toddlers. Highly durable too.", rating: 5, date: "2 days ago" },
+        { author: "Yasmin Al-Harbi - Jeddah", text: "The best storage bin I've bought! I use it to organize my baby's socks, pacifier clips, and small items next to the crib. The handles are very sturdy yet soft. Very fast shipping from Sahab Store!", rating: 5, date: "2 days ago" }
+      ];
+    }
+    if (productId === 'kids_portable_ball_pit') {
+      return lang === 'ar' ? [
+        { author: "أم جودي - الرياض", text: "الخيمة تجنن وتفتح النفس! سهلة الفتح بمجرد ما تطلعها من الكيس تنفتح لحالها بوب آب وحجمها جداً واسع وممتاز. أخذت معها كرات المحيط الملونة وعقدت أولادي فيها لساعات من اللعب الهادئ والممتع.", rating: 5, date: "قبل يومين" },
+        { author: "أبو سيف - الدمام", text: "ممتازة جداً وعملية! جودتها عالية وخياطتها قوية والسلك المعدني مغطى ومثني بشكل آمن تماماً، والأجمل سهولة طيها وحملها بالحقيبة الصغيرة المرفقة للمخيمات والرحلات العائلية والحديقة.", rating: 5, date: "قبل ٤ أيام" },
+        { author: "دلال العنزي - الكويت", text: "توصيل سريع مغلفة بأناقة متناهية. بنتي تستانس فيها وتلعب بداخلها وتعبي فيها ألعابها. القماش خفيف وسهل التنظيف بمسحة واحدة. أنصح فيها بشدة كهدية رائعة.", rating: 5, date: "قبل ٣ أيام" }
+      ] : [
+        { author: "Um Judy - Riyadh", text: "This play tent is amazing! Unfolds automatically in seconds without any effort. Perfect size for our living room. Bought it with Sahab's pastel ocean balls and they keep my little ones busy and happy for hours.", rating: 5, date: "2 days ago" },
+        { author: "Abu Seif - Dammam", text: "Highly practical and durable quality! The structural wire is fully wrapped and safely rounded. Stows away extremely small into the high-quality round zippered bag, perfect for family park picnics and outdoor travels.", rating: 5, date: "4 days ago" },
+        { author: "Dalal Al-Anzi - Kuwait", text: "Arrived very fast and premiumly boxed. My daughter absolute loves playing inside and gathering her stuffed toys in it. Extremely lightweight, easy to wipe clean in a single swab. Highly recommended!", rating: 5, date: "3 days ago" }
+      ];
+    }
+    if (productId === 'kids_ocean_balls_100pc') {
+      return lang === 'ar' ? [
+        { author: "أبو ماجد - الرياض", text: "رهيبة تبارك الله! حجمها ممتاز للأطفال والكرات مرنة ما تنعفج بسهولة، اشتريتها لملء خيمة الألعاب وحوض الكرات المائي لأولادي وصاروا يقضون فيها أوقات طويلة وممتعة.", rating: 5, date: "قبل ٣ أيام" },
+        { author: "أميرة العتيبي - جدة", text: "العلبة الشبكية ممتازة لتخزين الكرات بعد اللعب، الألوان هادئة وجميلة وغير فاقعة تفتح النفس. أهم شيء حوافها ناعمة تماماً وآمنة على ولدي الصغير عمره سنتين يعض عليها بدون ما أخاف عليه.", rating: 5, date: "قبل يومين" },
+        { author: "حمد الهاجري - قطر", text: "منتج رائع جداً وجودة البلاستيك ممتازة وخالية ريحتها من أي مواد كيميائية، الكرات ترجع لشكلها الطبيعي لو انضغطت بالغلط. شحن سريع وتوصيل ممتاز.", rating: 5, date: "قبل ٥ أيام" }
+      ] : [
+        { author: "Abu Majed - Riyadh", text: "Amazing value! The balls are strong yet flexible, they don't crush easily. Perfect for our indoor play tent and toddler ball pit pool. Kids are absolutely obsessed with it!", rating: 5, date: "3 days ago" },
+        { author: "Amira Al-Otaibi - Jeddah", text: "Great pastel color combination (pink, white, gray, blue). The net bag is very helpful for easy cleanup. Safe rounded surfaces are indeed free from sharp seams, great for my 2 year old.", rating: 5, date: "2 days ago" },
+        { author: "Hamad Al-Hajri - Qatar", text: "Excellent plastic quality, odor-free and ultra-safe. If accidentally stepped on, they just pop back into full shape. Fast direct shipping. Highly recommended!", rating: 5, date: "5 days ago" }
+      ];
+    }
+    if (productId === 'kids_baby_earmuffs') {
+      return lang === 'ar' ? [
+        { author: "أم سارة - جدة", text: "رهيبة تبارك الله! بني كانت تفزع من أقل صوت وهي نايمة وتصحى تبكي. الحين مع السماعة هذي صرنا نسافر بالسيارة ونحضر مناسبات عائلية وهي نايمة بسلام ونومها عميق ومستقر. الحزام قماش ناعم جداً وما يضغط على راسها.", rating: 5, date: "قبل يومين" },
+        { author: "فيصل العتيبي - الرياض", text: "جودة ممتازة وعملية جداً! أخذتها لولدي الصغير عشان نوفر له الهدوء أثناء السفر بالطائرة والرحلات الطويلة. العزل رائع والحزام قطني مرن ناعم جداً وسهل التعديل. أنصح فيها كل الآباء والأمهات.", rating: 5, date: "قبل ٤ أيام" },
+        { author: "منيرة الحربي - دبي", text: "توصيل سريع وخدمة ممتازة من متجر سحاب. السماعة خفيفة جداً ومريحة والأهم أنها آمنة وخاماتها طبية معقمة. بنتي تحب شكلها المريح وصارت تنام فيها بدون إزعاج.", rating: 5, date: "قبل يومين" }
+      ] : [
+        { author: "Um Sarah - Jeddah", text: "Honestly life-changing! My baby used to startle and wake up crying at the slightest noise. With these comfortable earmuffs, we can travel or attend family events and she sleeps so peacefully. The elastic band is super soft and puts no pressure on her head.", rating: 5, date: "2 days ago" },
+        { author: "Faisal Al-Otaibi - Riyadh", text: "Premium medical quality and highly effective. Got it for my baby boy for air travel and it blocks engine sounds wonderfully. Stretchy cotton strap is extremely soft and easy to adjust. Highly recommended!", rating: 5, date: "4 days ago" },
+        { author: "Munira Al-Harbi - Dubai", text: "Fast delivery and great customer service from Sahab. The ear cups are lightweight, well-padded, and medical-grade safe. Our baby falls asleep instantly without any disturbance.", rating: 5, date: "2 days ago" }
+      ];
+    }
+    if (productId === 'kids_ice_cream_bubble_maker') {
+      return lang === 'ar' ? [
+        { author: "أم يزن - الرياض", text: "يا الله على الفكرة الذكية والجميلة! بنتي كانت ترفض الاستحمام وتصيح، الحين تترجى تبي تسبح عشان تسوي آيس كريم رغوة وتلعب بالأقماع الملونة. جودة البلاستيك ممتازة وتثبت على الجدار بقوة.", rating: 5, date: "قبل يومين" },
+        { author: "سليمان - الخبر", text: "منتج بطل بطل! ميكانيكي بالكامل يدوي يعني آمن تماماً بدون بطاريات ولا تيار كهربائي، مجرد تصب سائل الاستحمام وشوية موية وتطلع رغوة كثيفة رهيبة. أولادي مستانسين فيها وكل شوي يسوون آيس كريم فقاعات.", rating: 5, date: "قبل ٤ أيام" },
+        { author: "نورة الدوسري - المنامة", text: "توصيل سريع والتغليف فخم وراقي ومناسب لتقديمه كهدية مميزة. الرغوة تطلع مثل سوفت سيرف آيس كريم، واللعبة صنعت أجواء مرحة وخيالية لا توصف بالاستحمام.", rating: 5, date: "قبل يومين" }
+      ] : [
+        { author: "Um Yazan - Riyadh", text: "What a brilliant and creative idea! My toddler used to throw tantrums before bathing, now she literally begs to take a bath just to play making ice cream foam. The plastic quality is solid, and suction is very powerful.", rating: 5, date: "2 days ago" },
+        { author: "Suleiman - Khobar", text: "Outstanding toy! Fully manual mechanical device with no battery hazards in water, which gives complete peace of mind. Just pour some body bath gel with water and pull the lever. Rich, dense micro-bubbles form instantly. Five stars!", rating: 5, date: "4 days ago" },
+        { author: "Noura Al-Dossari - Manama", text: "Fast delivery, beautifully boxed and makes a fantastic birthday gift. The foam flows exactly like real soft-serve ice cream. Made bathing incredibly fun and tear-free for my toddlers.", rating: 5, date: "2 days ago" }
+      ];
+    }
+    return lang === 'ar' ? [
+      { author: "أم يوسف - الرياض", text: "الخامة جداً ناعمة وخالية من المواد الكيمائية الضارة، طفلي يرتاح جداً بالمنتج وسهلة التعقيم والمسح المباشر.", rating: 5, date: "قبل ٣ أيام" },
+      { author: "ماريا • دبي", text: "الخامات رائعة والقطع ناعمة جداً على بشرة طفلي وجاءت مغلفة بقمة الأناقة والصحة. سأطلب كميات أخرى قريباً.", rating: 5, date: "قبل أسبوع" },
+      { author: "سارة العتيبي - جدة", text: "أكثر ما يعجبني هو تفاصيل حماية الأمن والسلامة للرضع، خفيف والعلب آمنة وخالية من المواد الضارة تماماً.", rating: 5, date: "قبل يومين" }
+    ] : [
+      { author: "Um Youssef - Riyadh", text: "The material is extremely soft and completely free from hazardous chemical additions. Safe, comfortable, and easy to sterilize/wash.", rating: 5, date: "3 days ago" },
+      { author: "Maria - Dubai", text: "Excellent botanical colors and premium safety structure. Packed with high elegance and medical care. Will order more presets soon!", rating: 5, date: "1 week ago" },
+      { author: "Sarah Al-Otaibi - Jeddah", text: "I highly appreciate the deep focus on newborn safety and BPA-free certifications. Lightweight, soft peach cosmetics, and sturdy built.", rating: 5, date: "2 days ago" }
+    ];
+  };
 
   // Filtering products
   const filteredProducts = products.filter(p => {
@@ -451,7 +527,7 @@ export default function PublicStore({
                     />
                   ) : (
                     <img
-                      src={selectedProduct.imageUrl}
+                      src={selectedImgUrl || selectedProduct.imageUrl}
                       alt={selectedProductDetails.title}
                       className="h-full w-full object-cover"
                       referrerPolicy="no-referrer"
@@ -459,40 +535,55 @@ export default function PublicStore({
                   )}
                 </div>
 
-                {/* Media Switcher (Image / Video) if video exists */}
-                {selectedProduct.videoUrl && (
-                  <div className="flex gap-2.5 mt-3 justify-center">
-                    <button
-                      onClick={() => setActiveMedia('image')}
-                      className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${
-                        activeMedia === 'image' ? 'border-[#ff7c5c] ring-2 ring-[#ff7c5c]/20' : 'border-[#e8dcd0]'
-                      }`}
-                    >
-                      <img
-                        src={selectedProduct.imageUrl}
-                        alt="Product Image"
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    </button>
-                    <button
-                      onClick={() => setActiveMedia('video')}
-                      className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 bg-black flex items-center justify-center transition-all ${
-                        activeMedia === 'video' ? 'border-[#ff7c5c] ring-2 ring-[#ff7c5c]/20' : 'border-[#e8dcd0]'
-                      }`}
-                    >
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
-                        <span className="text-white bg-[#ff7c5c] px-1.5 py-0.5 rounded font-extrabold text-[9px] uppercase tracking-wider">
-                          فيديو / VIDEO
-                        </span>
-                      </div>
-                      <img
-                        src={selectedProduct.imageUrl}
-                        alt="Video Thumbnail"
-                        className="w-full h-full object-cover opacity-65"
-                        referrerPolicy="no-referrer"
-                      />
-                    </button>
+                {/* Media Switcher (Images & Video) */}
+                {((selectedProduct.images && selectedProduct.images.length > 0) || selectedProduct.videoUrl) && (
+                  <div className="flex flex-wrap gap-2.5 mt-3 justify-center items-center">
+                    {(selectedProduct.images && selectedProduct.images.length > 0
+                      ? selectedProduct.images
+                      : [selectedProduct.imageUrl]
+                    ).map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setSelectedImgUrl(img);
+                          setActiveMedia('image');
+                        }}
+                        className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${
+                          activeMedia === 'image' && (selectedImgUrl === img || (!selectedImgUrl && img === selectedProduct.imageUrl))
+                            ? 'border-[#ff7c5c] ring-2 ring-[#ff7c5c]/20'
+                            : 'border-[#e8dcd0]'
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`Product Thumbnail ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      </button>
+                    ))}
+
+                    {/* Video option */}
+                    {selectedProduct.videoUrl && (
+                      <button
+                        onClick={() => setActiveMedia('video')}
+                        className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 bg-black flex items-center justify-center transition-all shrink-0 ${
+                          activeMedia === 'video' ? 'border-[#ff7c5c] ring-2 ring-[#ff7c5c]/20' : 'border-[#e8dcd0]'
+                        }`}
+                      >
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+                          <span className="text-white bg-[#ff7c5c] px-1.5 py-0.5 rounded font-extrabold text-[8px] uppercase tracking-wider">
+                            فيديو
+                          </span>
+                        </div>
+                        <img
+                          src={selectedProduct.imageUrl}
+                          alt="Video Thumbnail"
+                          className="w-full h-full object-cover opacity-65"
+                          referrerPolicy="no-referrer"
+                        />
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -664,7 +755,7 @@ export default function PublicStore({
                 ))}
 
                 {/* Preset Reviews */}
-                {presetReviews.map((rev, idx) => (
+                {getProductPresetReviews(selectedProduct.id, language).map((rev, idx) => (
                   <div key={idx} className="bg-gray-50/80 rounded-xl p-3 text-xs border border-gray-150">
                     <div className="flex justify-between items-center mb-1">
                       <span className="font-bold text-[#2f251e]">{rev.author}</span>
