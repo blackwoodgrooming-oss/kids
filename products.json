@@ -37,14 +37,12 @@
     "priceUsd": 12.30,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005011832106569.html",
-    "imageUrl": "/src/assets/images/kids_ocean_balls_main_1780307031504.png",
+    "imageUrl": "https://ae-pic-a1.aliexpress-media.com/kf/S660b9554f3df4f4baaa3fb1d5c728fa1p.jpg_220x220q75.jpg_.avif",
     "images": [
-      "/src/assets/images/kids_ocean_balls_main_1780307031504.png",
-      "/src/assets/images/kids_ocean_balls_pit_1780307054064.png",
-      "/src/assets/images/kids_ocean_balls_pastel_1780307073830.png",
-      "https://m.media-amazon.com/images/I/71XmbeHh0FL._AC_SL1500_.jpg",
-      "https://m.media-amazon.com/images/I/71R2RHe0CFL._AC_SL1500_.jpg",
-      "https://m.media-amazon.com/images/I/71p-jH6L-XL._AC_SL1500_.jpg"
+      "https://ae-pic-a1.aliexpress-media.com/kf/S660b9554f3df4f4baaa3fb1d5c728fa1p.jpg_220x220q75.jpg_.avif",
+      "https://ae-pic-a1.aliexpress-media.com/kf/S42815230d6ae4e16910c315a5118bbf6K.jpg_220x220q75.jpg_.avif",
+      "https://ae-pic-a1.aliexpress-media.com/kf/S51ac8857338047139f9644fdb410dc72a.jpg_220x220q75.jpg_.avif",
+      "https://ae-pic-a1.aliexpress-media.com/kf/S2f771bec92f0404dae4290c36aefc8cer.jpg_220x220q75.jpg_.avif"
     ],
     "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-pool-full-of-colorful-plastic-balls-34351-large.mp4",
     "category": "ألعاب تعليمية وتنمية مهارات",
