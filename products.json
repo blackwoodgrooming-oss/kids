@@ -22,7 +22,7 @@
     "features": [
       "✅ وقت استحمام مفاجئ: يحتوي كل قنبلة استحمام على لعبة بحرية لطيفة وفريدة (مثل سمكة قرش، دولفين، أخطبوط، إلخ). ضعها في الماء وشاهدها تزبد وتتفتح فقاعات ملونة، ثم اكتشف اللعبة المخفية—تحول وقت الاستحمام إلى مغامرة ممتعة تجعل الأطفال متحمسين للاستحمام!",
       "✅ 12 تركيبة عطرية: مُعززة بزيوت عطرية طبيعية (فانيلا، أعشاب بحرية، حليب، غاردينيا، ورد، زهر الكرز، نعناع، برتقال، يلانغ يلانغ، ياسمين، أوسمانثوس، لافندر). روائح غنية وآمنة على البشرة ترطب وتهدئ أثناء الاستحمام.",
-      "✅ آمنة ولطيفة على البشرة: مصنوعة من مكونات طبيعية، بدون أصباغ قاسية أو مواد كيميائية. مناسبة لبشرة الأطفال الحساسة،"
+      "✅ آمنة ولطيفة على البشرة: مصنوعة من مكونات طبيعية، بدون أصباغ قاسية أو مواد كيميائية. مناسبة لبشرة الأطفال الحساسة، ولا تترك بقعاً على الحوض بعد صيد اللعبة."
     ],
     "specs": {
       "الوزن الكلي": "صافي الوزن مجموعة A Set مع زهرة ملح البحر والفواكه",
@@ -33,17 +33,17 @@
   },
   {
     "id": "kids_ocean_balls_100pc",
-    "title": "100 قطعة من كرات الألعاب الملونة الناعمة للرياضات الخارجية، كرات مائية للسباحة للسباحة في حمام السباحة والمحيط، كرات صديقة للبيئة لتخفيف التوتر، ألعاب خيام هوائية للأطفال",
+    "title": "100 قطعة من كرات الألعاب الملونة الناعمة للرياضات الخارجية، كرات مائية للسباحة في حمام السباحة والمحيط، كرات صديقة للبيئة لتخفيف التوتر، ألعاب خيام هوائية للأطفال",
     "description": "كرات ألعاب ملونة وناعمة عالية الجودة ومثالية لملء خيام اللعب للأطفال، برك السباحة، بيوت الممرات، وحمامات الألعاب. مصنوعة من مواد بلاستيكية مرنة وصديقة للبيئة وخالية تماماً من الـ BPA والمواد السامة لضمان سلامة طفلك التامة. الكرات مصممة بسطح ناعم وبدون حواف حادة ولها قدرة عالية على مقاومة الضغط والتشوه، مما يجعلها لعبة تفاعلية ممتازة لتطوير مهارات اللمس والتنسيق الحركي واستكشاف الألوان لدى الصغار.",
     "price": 46,
     "priceUsd": 12.30,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005011832106569.html",
-    "imageUrl": "/assets/images/pit_balls_main_1780224560494.png",
+    "imageUrl": "/src/assets/images/kids_ocean_balls_main_1780307031504.png",
     "images": [
-      "/assets/images/pit_balls_main_1780224560494.png",
-      "/assets/images/pit_balls_pool_1780224580504.png",
-      "/assets/images/pit_balls_detail_1780224599907.png"
+      "/src/assets/images/kids_ocean_balls_main_1780307031504.png",
+      "/src/assets/images/kids_ocean_balls_pit_1780307054064.png",
+      "/src/assets/images/kids_ocean_balls_pastel_1780307073830.png"
     ],
     "category": "ألعاب تعليمية وتنمية مهارات",
     "stock": 250,
@@ -69,11 +69,11 @@
     "priceUsd": 21.14,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005011801458664.html",
-    "imageUrl": "/assets/images/ice_cream_bubble_maker_main_1780225208749.png",
+    "imageUrl": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80",
     "images": [
-      "/assets/images/ice_cream_bubble_maker_main_1780225208749.png",
-      "/assets/images/ice_cream_bubble_maker_kids_1780225233455.png",
-      "/assets/images/ice_cream_bubble_maker_accessories_1780225251670.png"
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&auto=format&fit=crop&q=80"
     ],
     "category": "ألعاب تعليمية وتنمية مهارات",
     "stock": 190,
@@ -99,11 +99,11 @@
     "priceUsd": 8.23,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005007450509338.html",
-    "imageUrl": "/assets/images/baby_earmuffs_main_1780225586781.png",
+    "imageUrl": "https://images.unsplash.com/photo-1590012357949-01c7df77e96d?w=800&auto=format&fit=crop&q=80",
     "images": [
-      "/assets/images/baby_earmuffs_main_1780225586781.png",
-      "/assets/images/baby_earmuffs_sleeping_1780225611800.png",
-      "/assets/images/baby_earmuffs_features_1780225634095.png"
+      "https://images.unsplash.com/photo-1590012357949-01c7df77e96d?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1504222490345-c075b6008014?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1498243691581-b145c3f54a5c?w=800&auto=format&fit=crop&q=80"
     ],
     "category": "رعاية وصحة الرضع",
     "stock": 350,
@@ -129,11 +129,11 @@
     "priceUsd": 11.76,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005009012151267.html",
-    "imageUrl": "/assets/images/ball_pit_main_1780225924396.png",
+    "imageUrl": "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800&auto=format&fit=crop&q=80",
     "images": [
-      "/assets/images/ball_pit_main_1780225924396.png",
-      "/assets/images/ball_pit_kids_1780225944934.png",
-      "/assets/images/ball_pit_details_1780225965851.png"
+      "https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&auto=format&fit=crop&q=80"
     ],
     "category": "ألعاب تعليمية وتنمية مهارات",
     "stock": 320,
@@ -148,22 +148,22 @@
       "المكونات والمحتوى": "خيمة حوض كرات سداسية وحقيبة حمل دائرية مدمجة بسحاب لسهولة التخزين",
       "المادة وخامة التصنيع": "بوليستر أكسفورد ناعم ومتين + سلك فولاذي مرن مطلي عالي القوة والتحمل",
       "الأبعاد والقطر": "قطر واسع يبلغ ١٠٠ سم مع ارتفاع جانب مناسب يبلغ ٣٠ سم لمنع الكرات من التناثر",
-      "الاستكشاف والفوائد": "تساعد في تخزين الألعاب وتنمية اللمس والتنسيق اليدوي البصري باستخدام الكرات الملونة وسهولة النقل"
+      "الاستخدام والفوائد": "تساعد في تخزين الألعاب وتنمية اللمس والتنسيق اليدوي البصري باستخدام الكرات الملونة وسهولة النقل"
     }
   },
   {
     "id": "kids_plush_melody_basket",
     "title": "سلة تخزين قطيفة My Melody كرتونية فائقة النعومة لتنظيم الملابس، الوجبات الخفيفة والدمى للأطفال",
-    "description": "سلة ومنظم تخزين قطيفة ناعم للغاية مستوحى من الشخصية الكرتونية المحبوبة ماي ميلودي (My Melody). تتميز بتصميم لطيف جداً مع آذان طويلة وشريط ملتف أنيق، وهي مصنوعة من قماش قطيفة (Plush) فائق النعومة ومخيطة بعناية يدوية فائقة تضفي بهجة وأناقة متميزة على غرف نوم الأطفال الرضع والصغار. مثالية لتنظيم وترتيب غرف الأطفال، وتخزين الدمى والألعاب، حفاضات الطفل، مستلزمات الرضع، الجوارب والملابس، أو حتى الوجبات الخفيفة. خفيفة جداً، متينة، وهيكل مبطن مرن يحمي الأطفال من أي صدمات مع سهولة الحمل بفضل المقابض الجانبية الناعمة.",
+    "description": "سلة ومنظم تخزين قطيفة ناعم للغاية مستوحى من الشخصية الكرتونية المحبوبة ماي ميلودي (My Melody). تتميز بتصميم لطيف جداً مع آذان طويلة وشريط ملتف أنيق، وهي مصنوعة من قماش قطيفة (Plush) فائق النعومة ومخيطة بعناية يدوية فائقة تضفي بهجة وأناقة متميزة على غرف نوم الأطفال الرضع والصغار. مثالية لتنظيم وترتيب غرف الأطفال، وتخزين الدمى والألعاب، حفاضات الطفل، مستلزمات الرضع, الجوارب والملابس، أو حتى الوجبات الخفيفة. خفيفة جداً، متينة، وهيكل مبطن مرن يحمي الأطفال من أي صدمات مع سهولة الحمل بفضل المقابض الجانبية الناعمة.",
     "price": 72,
     "priceUsd": 10.69,
     "source": "AliExpress",
     "sourceUrl": "https://ar.aliexpress.com/item/1005010182881382.html",
-    "imageUrl": "/assets/images/my_melody_basket_main_1780226402486.png",
+    "imageUrl": "https://images.unsplash.com/photo-1522844990619-4951c40f3eda?w=800&auto=format&fit=crop&q=80",
     "images": [
-      "/assets/images/my_melody_basket_main_1780226402486.png",
-      "/assets/images/my_melody_basket_lifestyle_1780226417414.png",
-      "/assets/images/my_melody_basket_details_1780226435569.png"
+      "https://images.unsplash.com/photo-1522844990619-4951c40f3eda?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1598124146163-36819847286d?w=800&auto=format&fit=crop&q=80"
     ],
     "category": "مستلزمات النوم والراحة",
     "stock": 180,
